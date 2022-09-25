@@ -57,57 +57,57 @@ public class SmsHandler {
         SmsManager smsManager = SmsManager.getDefault();
 
         // locate
-        if (providedOption.equals(Settings.LOCATE_OPTION)) {
+        if (providedOption.equals(Utils.LOCATE_OPTION)) {
 
             LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-            // GPS is off
-            if (!locationManager.isLocationEnabled()) {
-                smsManager.sendTextMessage(sender, null, "GPS is off ", null, null);
+            if(!locationManager.isLocationEnabled()){
+                // TODO: get last known location (requies google play services)
+                smsManager.sendTextMessage(sender, null,
+                        "Location is not enabled. " +
+                                "Unable to serve request.",null, null);
                 return;
             }
 
-            // GPS permission not granted
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                smsManager.sendTextMessage(sender, null,
-                        "GPS permission is not granted. " +
+            // Location permission not granted
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                    smsManager.sendTextMessage(sender, null,
+                        "Location permission is not granted. " +
                         "Unable to serve request.",null, null);
                 return;
             }
 
-            // API 30 and above
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                locationManager.getCurrentLocation(LocationManager.GPS_PROVIDER, null, context.getMainExecutor(), new Consumer<Location>() {
+            // API 31 and above
+            if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                locationManager.getCurrentLocation(LocationManager.FUSED_PROVIDER, null, context.getMainExecutor(), new Consumer<Location>() {
                     @Override
                     public void accept(Location location) {
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        smsManager.sendTextMessage(sender, null,
-                                "GPS coordinates are: " +
-                                "\nLatitude: " + latitude +
-                                "\nLongitude: " + longitude + "\n" +
-                                Utils.buildOSMLink(latitude, longitude), null, null);
+                        sendGpsCoordinates(smsManager, sender, location.getLatitude(), location.getLongitude());
                     }
                 });
             }
 
-            // Legacy (API < 29)
+            // Legacy (API < 31)
             else{
                 Criteria locationCriteria = new Criteria();
                 locationCriteria.setAccuracy(Criteria.ACCURACY_FINE);
                 locationManager.requestSingleUpdate(locationCriteria, new LocationListener() {
                     @Override
                     public void onLocationChanged(@NonNull Location location) {
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        smsManager.sendTextMessage(sender, null,
-                                "GPS coordinates are:" +
-                                        "\nLatitude: " + latitude +
-                                        "\nLongitude: " + longitude + "\n" +
-                                        Utils.buildOSMLink(latitude, longitude), null, null);
+                        sendGpsCoordinates(smsManager, sender, location.getLatitude(), location.getLongitude());
                     }
                 }, null);
             }
         }
+    }
+
+    private void sendGpsCoordinates(SmsManager smsManager, String sendTo, double latitude, double longitude){
+        smsManager.sendTextMessage(sendTo, null,
+                "GPS coordinates are:" +
+                        "\nLatitude: " + latitude +
+                        "\nLongitude: " + longitude + "\n" +
+                        Utils.buildOSMLink(latitude, longitude), null, null);
     }
 }
