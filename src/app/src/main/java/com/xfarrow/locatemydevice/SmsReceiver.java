@@ -10,7 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class SmsReceiver extends BroadcastReceiver {
-
+    // https://www.vogella.com/tutorials/AndroidBroadcastReceiver/article.html
     // This method gets fired as soon as it receives an SMS
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -33,7 +33,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 }
                 // getOriginatingAddress() will always be the same in messages[X] for 0<=X<messages.length
                 String sender = messages[0].getOriginatingAddress();
-                String message = sb.toString();
+                String message = sb.toString().trim();
 
                 // prevent any other broadcast receivers from receiving broadcast
                 abortBroadcast();

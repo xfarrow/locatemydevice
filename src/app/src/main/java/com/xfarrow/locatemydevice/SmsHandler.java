@@ -9,12 +9,20 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.CellInfo;
+import android.telephony.CellInfoCdma;
+import android.telephony.CellInfoGsm;
+import android.telephony.CellInfoLte;
+import android.telephony.CellInfoWcdma;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
+import android.telephony.gsm.GsmCellLocation;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,11 +30,9 @@ import java.util.regex.Pattern;
 public class SmsHandler {
     /*
      * Messages:
-     * finddevice 1234 locate
      * [command] [password] [option]
      *
      */
-    @RequiresApi(api = Build.VERSION_CODES.R)
     public void handleSms(String message, String sender, Context context) {
         Settings settings = new Settings(context);
         String password = settings.get(Settings.PASSWORD);
@@ -39,7 +45,7 @@ public class SmsHandler {
                 + "\\s"
                 + "[^\\s]*"
                 + "\\s"
-                + Utils.LOCATE_OPTION;
+                + Utils.LOCATE_OPTION + "|" + Utils.CELLULAR_INFO_OPTION;
         Pattern pattern = Pattern.compile(regexToMatch);
         Matcher matcher = pattern.matcher(message);
         if (!matcher.find()) {
@@ -101,11 +107,56 @@ public class SmsHandler {
                 }, null);
             }
         }
+
+        // cellinfo
+        else if(providedOption.equals(Utils.CELLULAR_INFO_OPTION)) {
+
+            TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            StringBuilder resultSms = new StringBuilder();
+
+            resultSms.append("Towers in range:");
+            List<CellInfo> availableTowersInRange = telephony.getAllCellInfo();
+            for(CellInfo tower : availableTowersInRange){
+                resultSms.append("\n\n");
+                if(tower.isRegistered()){
+                    resultSms.append("[Connected to this tower]\n");
+                }
+                if (tower instanceof CellInfoWcdma) {
+                    resultSms.append("Radio Type: WCDMA\n");
+                    resultSms.append("CID: ").append(((CellInfoWcdma) tower).getCellIdentity().getCid()).append("\n");
+                    resultSms.append("LAC: ").append(((CellInfoWcdma) tower).getCellIdentity().getLac()).append("\n");
+                    resultSms.append("MCC: ").append(((CellInfoWcdma) tower).getCellIdentity().getMccString()).append("\n");
+                    resultSms.append("MNC: ").append(((CellInfoWcdma) tower).getCellIdentity().getMncString()).append("\n");
+                }
+                else if (tower instanceof CellInfoGsm) {
+                    resultSms.append("Radio Type: GSM\n");
+                    resultSms.append("CID: ").append(((CellInfoGsm) tower).getCellIdentity().getCid()).append("\n");
+                    resultSms.append("LAC: ").append(((CellInfoGsm) tower).getCellIdentity().getLac()).append("\n");
+                    resultSms.append("MCC: ").append(((CellInfoGsm) tower).getCellIdentity().getMccString()).append("\n");
+                    resultSms.append("MNC: ").append(((CellInfoGsm) tower).getCellIdentity().getMncString()).append("\n");
+                }
+                else if (tower instanceof CellInfoLte) {
+                    resultSms.append("Radio Type: LTE\n");
+                    resultSms.append("CI: ").append(((CellInfoLte) tower).getCellIdentity().getCi()).append("\n");
+                    resultSms.append("TAC: ").append(((CellInfoLte) tower).getCellIdentity().getTac()).append("\n");
+                    resultSms.append("MCC: ").append(((CellInfoLte) tower).getCellIdentity().getMccString()).append("\n");
+                    resultSms.append("MNC: ").append(((CellInfoLte) tower).getCellIdentity().getMncString()).append("\n");
+                }
+                else if (tower instanceof CellInfoCdma) {
+                    resultSms.append("Radio Type: CDMA\n");
+                    resultSms.append("Latitude: ").append(((CellInfoCdma) tower).getCellIdentity().getLatitude()).append("\n");
+                    resultSms.append("Longitude: ").append(((CellInfoCdma) tower).getCellIdentity().getLongitude()).append("\n");
+                    resultSms.append("Network ID: ").append(((CellInfoCdma) tower).getCellIdentity().getNetworkId()).append("\n");
+                    resultSms.append("System ID: ").append(((CellInfoCdma) tower).getCellIdentity().getSystemId()).append("\n");
+                }
+            }
+            smsManager.sendTextMessage(sender, null, resultSms.toString(),null, null);
+        }
     }
 
     private void sendGpsCoordinates(SmsManager smsManager, String sendTo, double latitude, double longitude){
         smsManager.sendTextMessage(sendTo, null,
-                "GPS coordinates are:" +
+                "Coordinates are:" +
                         "\nLatitude: " + latitude +
                         "\nLongitude: " + longitude + "\n" +
                         Utils.buildOSMLink(latitude, longitude), null, null);
