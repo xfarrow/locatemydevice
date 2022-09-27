@@ -5,11 +5,8 @@ import java.util.Locale;
 
 public class Utils {
 
-    public static final int PERMISSION_SMS_RECEIVE = 100;
-    public static final int PERMISSION_SMS_SEND = 101;
-    public static final int PERMISSION_ACCESS_FINE_LOCATION = 102;
-    public static final int PERMISSION_ACCESS_COARSE_LOCATION = 103;
-    public static final int PERMISSION_ACCESS_BACKGROUND_LOCATION = 104;
+    public static final int PERMISSION_MULTIPLE = 100;
+    public static final int PERMISSION_ACCESS_BACKGROUND_LOCATION = 101;
 
 
     public static final String LOCATE_OPTION = "locate";

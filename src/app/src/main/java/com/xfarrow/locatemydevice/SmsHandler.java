@@ -23,6 +23,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
 import java.security.cert.CertPathValidatorException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -68,21 +69,20 @@ public class SmsHandler {
 
             LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
+            // location not enabled
             if(!locationManager.isLocationEnabled()){
                 // TODO: get last known location (requies google play services)
-                smsManager.sendTextMessage(sender, null,
-                        "Location is not enabled. " +
-                                "Unable to serve request.",null, null);
+                String response ="Location is not enabled. Unable to serve request.";
+                ArrayList<String> parts = smsManager.divideMessage(response);
+                smsManager.sendMultipartTextMessage (sender, null, parts,null, null);
                 return;
             }
 
             // Location permission not granted
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-                    smsManager.sendTextMessage(sender, null,
-                        "Location permission is not granted. " +
-                        "Unable to serve request.",null, null);
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                String response ="Location permission is not granted. Unable to serve request.";
+                ArrayList<String> parts = smsManager.divideMessage(response);
+                smsManager.sendMultipartTextMessage (sender, null, parts,null, null);
                 return;
             }
 
@@ -169,15 +169,19 @@ public class SmsHandler {
                     resultSms.append("System ID: ").append(((CellInfoCdma) tower).getCellIdentity().getSystemId()).append("\n");
                 }
             }
-            smsManager.sendTextMessage(sender, null, resultSms.toString(),null, null);
+            ArrayList<String> parts = smsManager.divideMessage(resultSms.toString());
+            smsManager.sendMultipartTextMessage (sender, null, parts,null, null);
         }
     }
 
     private void sendGpsCoordinates(SmsManager smsManager, String sendTo, double latitude, double longitude){
-        smsManager.sendTextMessage(sendTo, null,
-                "Coordinates are:" +
-                        "\nLatitude: " + latitude +
-                        "\nLongitude: " + longitude + "\n" +
-                        Utils.buildOSMLink(latitude, longitude), null, null);
+
+        String response = "Coordinates are:" +
+                "\nLatitude: " + latitude +
+                "\nLongitude: " + longitude + "\n" +
+                Utils.buildOSMLink(latitude, longitude);
+
+        ArrayList<String> parts = smsManager.divideMessage(response);
+        smsManager.sendMultipartTextMessage (sendTo, null, parts,null, null);
     }
 }
