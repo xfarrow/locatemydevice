@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
+import java.security.cert.CertPathValidatorException;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -86,7 +87,7 @@ public class SmsHandler {
             }
 
             // API 31 and above
-            if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
                 locationManager.getCurrentLocation(LocationManager.FUSED_PROVIDER, null, context.getMainExecutor(), new Consumer<Location>() {
                     @Override
                     public void accept(Location location) {
@@ -112,17 +113,29 @@ public class SmsHandler {
         else if(providedOption.equals(Utils.CELLULAR_INFO_OPTION)) {
 
             TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
             StringBuilder resultSms = new StringBuilder();
 
-            resultSms.append("Towers in range:");
+            resultSms.append("Network country: ");
+            String country = telephony.getNetworkCountryIso();
+            resultSms.append(Utils.getCountryNameByIso(country)).append("\n\n");
+
             List<CellInfo> availableTowersInRange = telephony.getAllCellInfo();
+            resultSms.append("Towers in range: ");
+            if(availableTowersInRange.size() == 0) {
+                resultSms.append("none or location is off.");
+            }
+
             for(CellInfo tower : availableTowersInRange){
                 resultSms.append("\n\n");
+
                 if(tower.isRegistered()){
                     resultSms.append("[Connected to this tower]\n");
                 }
                 if (tower instanceof CellInfoWcdma) {
                     resultSms.append("Radio Type: WCDMA\n");
+                    resultSms.append("Strength: ");
+                    resultSms.append(((CellInfoWcdma)tower).getCellSignalStrength().getLevel()).append("/4\n");
                     resultSms.append("CID: ").append(((CellInfoWcdma) tower).getCellIdentity().getCid()).append("\n");
                     resultSms.append("LAC: ").append(((CellInfoWcdma) tower).getCellIdentity().getLac()).append("\n");
                     resultSms.append("MCC: ").append(((CellInfoWcdma) tower).getCellIdentity().getMccString()).append("\n");
@@ -130,6 +143,8 @@ public class SmsHandler {
                 }
                 else if (tower instanceof CellInfoGsm) {
                     resultSms.append("Radio Type: GSM\n");
+                    resultSms.append("Strength: ");
+                    resultSms.append(((CellInfoGsm)tower).getCellSignalStrength().getLevel()).append("/4\n");
                     resultSms.append("CID: ").append(((CellInfoGsm) tower).getCellIdentity().getCid()).append("\n");
                     resultSms.append("LAC: ").append(((CellInfoGsm) tower).getCellIdentity().getLac()).append("\n");
                     resultSms.append("MCC: ").append(((CellInfoGsm) tower).getCellIdentity().getMccString()).append("\n");
@@ -137,6 +152,8 @@ public class SmsHandler {
                 }
                 else if (tower instanceof CellInfoLte) {
                     resultSms.append("Radio Type: LTE\n");
+                    resultSms.append("Strength: ");
+                    resultSms.append(((CellInfoLte)tower).getCellSignalStrength().getLevel()).append("/4\n");
                     resultSms.append("CI: ").append(((CellInfoLte) tower).getCellIdentity().getCi()).append("\n");
                     resultSms.append("TAC: ").append(((CellInfoLte) tower).getCellIdentity().getTac()).append("\n");
                     resultSms.append("MCC: ").append(((CellInfoLte) tower).getCellIdentity().getMccString()).append("\n");
@@ -144,6 +161,8 @@ public class SmsHandler {
                 }
                 else if (tower instanceof CellInfoCdma) {
                     resultSms.append("Radio Type: CDMA\n");
+                    resultSms.append("Strength: ");
+                    resultSms.append(((CellInfoCdma)tower).getCellSignalStrength().getLevel()).append("/4\n");
                     resultSms.append("Latitude: ").append(((CellInfoCdma) tower).getCellIdentity().getLatitude()).append("\n");
                     resultSms.append("Longitude: ").append(((CellInfoCdma) tower).getCellIdentity().getLongitude()).append("\n");
                     resultSms.append("Network ID: ").append(((CellInfoCdma) tower).getCellIdentity().getNetworkId()).append("\n");
