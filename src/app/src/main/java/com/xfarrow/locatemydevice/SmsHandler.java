@@ -2,11 +2,14 @@ package com.xfarrow.locatemydevice;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.CellInfo;
@@ -47,7 +50,7 @@ public class SmsHandler {
                 + "\\s"
                 + "[^\\s]*"
                 + "\\s"
-                + Utils.LOCATE_OPTION + "|" + Utils.CELLULAR_INFO_OPTION;
+                + Utils.LOCATE_OPTION + "|" + Utils.CELLULAR_INFO_OPTION + "|" + Utils.BATTERY_OPTION;
         Pattern pattern = Pattern.compile(regexToMatch);
         Matcher matcher = pattern.matcher(message);
         if (!matcher.find()) {
@@ -170,6 +173,43 @@ public class SmsHandler {
                 }
             }
             ArrayList<String> parts = smsManager.divideMessage(resultSms.toString());
+            smsManager.sendMultipartTextMessage (sender, null, parts,null, null);
+        }
+
+        else if(providedOption.equals(Utils.BATTERY_OPTION)){
+            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            Intent batteryStatus = context.registerReceiver(null, ifilter);
+
+            StringBuilder sb = new StringBuilder();
+
+            // Battery level
+            int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+            float batteryPct = level * 100 / (float)scale;
+            sb.append("Battery level: ").append(Math.round(batteryPct)).append("%\n");
+
+            // Are we charging / charged?
+            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+            boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING
+                    || status == BatteryManager.BATTERY_STATUS_FULL;
+            sb.append("Charging: ");
+            if(isCharging) sb.append("Yes\n");
+            else sb.append("No");
+
+            // How are we charging?
+            if(isCharging) {
+                int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+                sb.append("Charging through: ");
+                if(chargePlug == BatteryManager.BATTERY_PLUGGED_USB)
+                    sb.append("USB");
+                else if(chargePlug == BatteryManager.BATTERY_PLUGGED_AC)
+                    sb.append("AC (wall)");
+                else if( chargePlug == BatteryManager.BATTERY_PLUGGED_WIRELESS)
+                    sb.append("Wireless");
+                else
+                    sb.append("Unknown");
+            }
+            ArrayList<String> parts = smsManager.divideMessage(sb.toString());
             smsManager.sendMultipartTextMessage (sender, null, parts,null, null);
         }
     }

@@ -11,6 +11,7 @@ public class Utils {
 
     public static final String LOCATE_OPTION = "locate";
     public static final String CELLULAR_INFO_OPTION = "cellinfo";
+    public static final String BATTERY_OPTION = "battery";
 
     public static String buildOSMLink(double latitude, double longitude){
         return "https://www.openstreetmap.org/?mlat=" + latitude + "&mlon=" + longitude;
