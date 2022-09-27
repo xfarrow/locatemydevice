@@ -22,6 +22,7 @@ Send an SMS to the device you want to locate to retrieve information about it.
 Option | Explaination 
 -------|:------------|
 locate | Will return the most accurate set of coordinates possible <br/> and a link to them pinpointed to OpenStreetMap |
-cellinfo | Will return a set of uniquely identifiable information about cell towers near the phone. <br/> You can then put this information on [OpenCellId][1] to individuate the smartphone's <br/> approximate location. Requires enabled location. |
+cellinfo | Will return a set of uniquely identifiable information about cell towers near the phone. <br/> You can then put this information on [OpenCellId][1] to individuate the smartphone's <br/> approximate location. Requires enabled location |
+battery | Will return battery infos |
 
 [1]: https://opencellid.org/
