@@ -1,6 +1,7 @@
 package com.xfarrow.locatemydevice;
 
 import android.Manifest;
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -9,9 +10,9 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoCdma;
 import android.telephony.CellInfoGsm;
@@ -19,14 +20,8 @@ import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
-import android.telephony.gsm.GsmCellLocation;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
-
-import java.security.cert.CertPathValidatorException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -50,7 +45,14 @@ public class SmsHandler {
                 + "\\s"
                 + "[^\\s]*"
                 + "\\s"
-                + Utils.LOCATE_OPTION + "|" + Utils.CELLULAR_INFO_OPTION + "|" + Utils.BATTERY_OPTION;
+                + Utils.LOCATE_OPTION
+                + "|"
+                + Utils.CELLULAR_INFO_OPTION
+                + "|"
+                + Utils.BATTERY_OPTION
+                + "|"
+                + Utils.CALL_ME_OPTION;
+
         Pattern pattern = Pattern.compile(regexToMatch);
         Matcher matcher = pattern.matcher(message);
         if (!matcher.find()) {
@@ -76,16 +78,14 @@ public class SmsHandler {
             if(!locationManager.isLocationEnabled()){
                 // TODO: get last known location (requies google play services)
                 String response ="Location is not enabled. Unable to serve request.";
-                ArrayList<String> parts = smsManager.divideMessage(response);
-                smsManager.sendMultipartTextMessage (sender, null, parts,null, null);
+                Utils.sendSms(smsManager, response, sender);
                 return;
             }
 
             // Location permission not granted
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 String response ="Location permission is not granted. Unable to serve request.";
-                ArrayList<String> parts = smsManager.divideMessage(response);
-                smsManager.sendMultipartTextMessage (sender, null, parts,null, null);
+                Utils.sendSms(smsManager, response, sender);
                 return;
             }
 
@@ -94,7 +94,8 @@ public class SmsHandler {
                 locationManager.getCurrentLocation(LocationManager.FUSED_PROVIDER, null, context.getMainExecutor(), new Consumer<Location>() {
                     @Override
                     public void accept(Location location) {
-                        sendGpsCoordinates(smsManager, sender, location.getLatitude(), location.getLongitude());
+                        String response = Utils.buildCoordinatesResponse(location.getLatitude(), location.getLongitude());
+                        Utils.sendSms(smsManager, response , sender);
                     }
                 });
             }
@@ -106,7 +107,8 @@ public class SmsHandler {
                 locationManager.requestSingleUpdate(locationCriteria, new LocationListener() {
                     @Override
                     public void onLocationChanged(@NonNull Location location) {
-                        sendGpsCoordinates(smsManager, sender, location.getLatitude(), location.getLongitude());
+                        String response = Utils.buildCoordinatesResponse(location.getLatitude(), location.getLongitude());
+                        Utils.sendSms(smsManager, response, sender);
                     }
                 }, null);
             }
@@ -117,111 +119,118 @@ public class SmsHandler {
 
             TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
-            StringBuilder resultSms = new StringBuilder();
+            StringBuilder responseSms = new StringBuilder();
 
-            resultSms.append("Network country: ");
+            responseSms.append("Network country: ");
             String country = telephony.getNetworkCountryIso();
-            resultSms.append(Utils.getCountryNameByIso(country)).append("\n\n");
+            responseSms.append(Utils.getCountryNameByIso(country)).append("\n\n");
 
             List<CellInfo> availableTowersInRange = telephony.getAllCellInfo();
-            resultSms.append("Towers in range: ");
+            responseSms.append("Towers in range: ");
             if(availableTowersInRange.size() == 0) {
-                resultSms.append("none or location is off.");
+                responseSms.append("none or location is off.");
             }
 
             for(CellInfo tower : availableTowersInRange){
-                resultSms.append("\n\n");
+                responseSms.append("\n\n");
 
                 if(tower.isRegistered()){
-                    resultSms.append("[Connected to this tower]\n");
+                    responseSms.append("[Connected to this tower]\n");
                 }
                 if (tower instanceof CellInfoWcdma) {
-                    resultSms.append("Radio Type: WCDMA\n");
-                    resultSms.append("Strength: ");
-                    resultSms.append(((CellInfoWcdma)tower).getCellSignalStrength().getLevel()).append("/4\n");
-                    resultSms.append("CID: ").append(((CellInfoWcdma) tower).getCellIdentity().getCid()).append("\n");
-                    resultSms.append("LAC: ").append(((CellInfoWcdma) tower).getCellIdentity().getLac()).append("\n");
-                    resultSms.append("MCC: ").append(((CellInfoWcdma) tower).getCellIdentity().getMccString()).append("\n");
-                    resultSms.append("MNC: ").append(((CellInfoWcdma) tower).getCellIdentity().getMncString()).append("\n");
+                    responseSms.append("Radio Type: WCDMA\n");
+                    responseSms.append("Strength: ");
+                    responseSms.append(((CellInfoWcdma)tower).getCellSignalStrength().getLevel()).append("/4\n");
+                    responseSms.append("CID: ").append(((CellInfoWcdma) tower).getCellIdentity().getCid()).append("\n");
+                    responseSms.append("LAC: ").append(((CellInfoWcdma) tower).getCellIdentity().getLac()).append("\n");
+                    responseSms.append("MCC: ").append(((CellInfoWcdma) tower).getCellIdentity().getMccString()).append("\n");
+                    responseSms.append("MNC: ").append(((CellInfoWcdma) tower).getCellIdentity().getMncString()).append("\n");
                 }
                 else if (tower instanceof CellInfoGsm) {
-                    resultSms.append("Radio Type: GSM\n");
-                    resultSms.append("Strength: ");
-                    resultSms.append(((CellInfoGsm)tower).getCellSignalStrength().getLevel()).append("/4\n");
-                    resultSms.append("CID: ").append(((CellInfoGsm) tower).getCellIdentity().getCid()).append("\n");
-                    resultSms.append("LAC: ").append(((CellInfoGsm) tower).getCellIdentity().getLac()).append("\n");
-                    resultSms.append("MCC: ").append(((CellInfoGsm) tower).getCellIdentity().getMccString()).append("\n");
-                    resultSms.append("MNC: ").append(((CellInfoGsm) tower).getCellIdentity().getMncString()).append("\n");
+                    responseSms.append("Radio Type: GSM\n");
+                    responseSms.append("Strength: ");
+                    responseSms.append(((CellInfoGsm)tower).getCellSignalStrength().getLevel()).append("/4\n");
+                    responseSms.append("CID: ").append(((CellInfoGsm) tower).getCellIdentity().getCid()).append("\n");
+                    responseSms.append("LAC: ").append(((CellInfoGsm) tower).getCellIdentity().getLac()).append("\n");
+                    responseSms.append("MCC: ").append(((CellInfoGsm) tower).getCellIdentity().getMccString()).append("\n");
+                    responseSms.append("MNC: ").append(((CellInfoGsm) tower).getCellIdentity().getMncString()).append("\n");
                 }
                 else if (tower instanceof CellInfoLte) {
-                    resultSms.append("Radio Type: LTE\n");
-                    resultSms.append("Strength: ");
-                    resultSms.append(((CellInfoLte)tower).getCellSignalStrength().getLevel()).append("/4\n");
-                    resultSms.append("CI: ").append(((CellInfoLte) tower).getCellIdentity().getCi()).append("\n");
-                    resultSms.append("TAC: ").append(((CellInfoLte) tower).getCellIdentity().getTac()).append("\n");
-                    resultSms.append("MCC: ").append(((CellInfoLte) tower).getCellIdentity().getMccString()).append("\n");
-                    resultSms.append("MNC: ").append(((CellInfoLte) tower).getCellIdentity().getMncString()).append("\n");
+                    responseSms.append("Radio Type: LTE\n");
+                    responseSms.append("Strength: ");
+                    responseSms.append(((CellInfoLte)tower).getCellSignalStrength().getLevel()).append("/4\n");
+                    responseSms.append("CI: ").append(((CellInfoLte) tower).getCellIdentity().getCi()).append("\n");
+                    responseSms.append("TAC: ").append(((CellInfoLte) tower).getCellIdentity().getTac()).append("\n");
+                    responseSms.append("MCC: ").append(((CellInfoLte) tower).getCellIdentity().getMccString()).append("\n");
+                    responseSms.append("MNC: ").append(((CellInfoLte) tower).getCellIdentity().getMncString()).append("\n");
                 }
                 else if (tower instanceof CellInfoCdma) {
-                    resultSms.append("Radio Type: CDMA\n");
-                    resultSms.append("Strength: ");
-                    resultSms.append(((CellInfoCdma)tower).getCellSignalStrength().getLevel()).append("/4\n");
-                    resultSms.append("Latitude: ").append(((CellInfoCdma) tower).getCellIdentity().getLatitude()).append("\n");
-                    resultSms.append("Longitude: ").append(((CellInfoCdma) tower).getCellIdentity().getLongitude()).append("\n");
-                    resultSms.append("Network ID: ").append(((CellInfoCdma) tower).getCellIdentity().getNetworkId()).append("\n");
-                    resultSms.append("System ID: ").append(((CellInfoCdma) tower).getCellIdentity().getSystemId()).append("\n");
+                    responseSms.append("Radio Type: CDMA\n");
+                    responseSms.append("Strength: ");
+                    responseSms.append(((CellInfoCdma)tower).getCellSignalStrength().getLevel()).append("/4\n");
+                    responseSms.append("Latitude: ").append(((CellInfoCdma) tower).getCellIdentity().getLatitude()).append("\n");
+                    responseSms.append("Longitude: ").append(((CellInfoCdma) tower).getCellIdentity().getLongitude()).append("\n");
+                    responseSms.append("Network ID: ").append(((CellInfoCdma) tower).getCellIdentity().getNetworkId()).append("\n");
+                    responseSms.append("System ID: ").append(((CellInfoCdma) tower).getCellIdentity().getSystemId()).append("\n");
                 }
             }
-            ArrayList<String> parts = smsManager.divideMessage(resultSms.toString());
-            smsManager.sendMultipartTextMessage (sender, null, parts,null, null);
+            Utils.sendSms(smsManager, responseSms.toString(), sender);
         }
 
+        // battery
         else if(providedOption.equals(Utils.BATTERY_OPTION)){
             IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
             Intent batteryStatus = context.registerReceiver(null, ifilter);
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder responseSms = new StringBuilder();
 
             // Battery level
             int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
             float batteryPct = level * 100 / (float)scale;
-            sb.append("Battery level: ").append(Math.round(batteryPct)).append("%\n");
+            responseSms.append("Battery level: ").append(Math.round(batteryPct)).append("%\n");
 
             // Are we charging / charged?
             int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
             boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING
                     || status == BatteryManager.BATTERY_STATUS_FULL;
-            sb.append("Charging: ");
-            if(isCharging) sb.append("Yes\n");
-            else sb.append("No");
+            responseSms.append("Charging: ");
+            if(isCharging) responseSms.append("Yes\n");
+            else responseSms.append("No");
 
             // How are we charging?
             if(isCharging) {
                 int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-                sb.append("Charging through: ");
+                responseSms.append("Charging through: ");
                 if(chargePlug == BatteryManager.BATTERY_PLUGGED_USB)
-                    sb.append("USB");
+                    responseSms.append("USB");
                 else if(chargePlug == BatteryManager.BATTERY_PLUGGED_AC)
-                    sb.append("AC (wall)");
+                    responseSms.append("AC (wall)");
                 else if( chargePlug == BatteryManager.BATTERY_PLUGGED_WIRELESS)
-                    sb.append("Wireless");
+                    responseSms.append("Wireless");
                 else
-                    sb.append("Unknown");
+                    responseSms.append("Unknown");
             }
-            ArrayList<String> parts = smsManager.divideMessage(sb.toString());
-            smsManager.sendMultipartTextMessage (sender, null, parts,null, null);
+            Utils.sendSms(smsManager, responseSms.toString(), sender);
         }
-    }
 
-    private void sendGpsCoordinates(SmsManager smsManager, String sendTo, double latitude, double longitude){
+        //callme
+        // Permission restrictions: https://developer.android.com/guide/components/activities/background-starts
+        // So we ask to grant the SYSTEM_ALERT_WINDOW permission
+        else if(providedOption.equals(Utils.CALL_ME_OPTION)){
+            // if canDrawOverlays() returns false, not necessarily it will be impossible to
+            // launch a call.
+            if(!android.provider.Settings.canDrawOverlays(context)){
+                Utils.sendSms(smsManager, "\"Display over other app\" permission was not " +
+                        "granted, thus it might be impossible to initiate a call.", sender);
+            }
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:" + sender));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
 
-        String response = "Coordinates are:" +
-                "\nLatitude: " + latitude +
-                "\nLongitude: " + longitude + "\n" +
-                Utils.buildOSMLink(latitude, longitude);
-
-        ArrayList<String> parts = smsManager.divideMessage(response);
-        smsManager.sendMultipartTextMessage (sendTo, null, parts,null, null);
+            DevicePolicyManager manager = ((DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE));
+            manager.lockNow();
+        }
     }
 }
