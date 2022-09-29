@@ -26,4 +26,9 @@ cellinfo | Will return a set of uniquely identifiable information about cell tow
 battery | Will return battery infos |
 callme | You will receive a call from the lost smartphone |
 
+## Legal notice
+* This software is licensed under the GNU General Public License v3.0. Click [here](https://github.com/xfarrow/locatemydevice/blob/main/LICENSE) for more information;
+* As specified in the license, the software is provided "as is" with no warranty;
+* This software is not meant to be the only installed device locator. It is strongly advised to use it in conjunction with Google Find My Device; in fact it might suffer from a bug or might be unresponsive when you need it the most.
+
 [1]: https://opencellid.org/
