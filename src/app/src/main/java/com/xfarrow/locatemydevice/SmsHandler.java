@@ -228,9 +228,6 @@ public class SmsHandler {
             intent.setData(Uri.parse("tel:" + sender));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-
-            DevicePolicyManager manager = ((DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE));
-            manager.lockNow();
         }
     }
 }
