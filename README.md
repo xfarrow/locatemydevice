@@ -7,7 +7,7 @@ This app helps to locate a lost smartphone through the use of conventional SMS. 
 | <img src="/images/home.png" alt="Homescreen" width="190" height="390.641"> | <img src="/images/sms.png" width="190" height="390.641"> |
 
 ## Usage
-Send an SMS to the device you want to locate to retrieve information about it.
+Send an SMS to the device you want to locate in order to retrieve information about it.
 
 **Synopsis**
 <br/>
@@ -24,5 +24,6 @@ Option | Explaination
 locate | Will return the most accurate set of coordinates possible <br/> and a link to them pinpointed to OpenStreetMap |
 cellinfo | Will return a set of uniquely identifiable information about cell towers near the phone. <br/> You can then put this information on [OpenCellId][1] to individuate the smartphone's <br/> approximate location. Requires enabled location |
 battery | Will return battery infos |
+callme | You will receive a call from the lost smartphone |
 
 [1]: https://opencellid.org/
