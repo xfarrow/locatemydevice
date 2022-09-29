@@ -11,6 +11,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.telephony.CellInfo;
@@ -51,7 +54,9 @@ public class SmsHandler {
                 + "|"
                 + Utils.BATTERY_OPTION
                 + "|"
-                + Utils.CALL_ME_OPTION;
+                + Utils.CALL_ME_OPTION
+                + "|"
+                + Utils.WIFI_OPTION;
 
         Pattern pattern = Pattern.compile(regexToMatch);
         Matcher matcher = pattern.matcher(message);
@@ -228,6 +233,37 @@ public class SmsHandler {
             intent.setData(Uri.parse("tel:" + sender));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
+        }
+
+        else if(providedOption.equals(Utils.WIFI_OPTION)){
+            StringBuilder responseSms = new StringBuilder();
+            WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            responseSms.append("Wifi enabled: ");
+
+            if(!wifiManager.isWifiEnabled()){
+                responseSms.append("No");
+            }
+            else{
+                responseSms.append("Yes\n");
+
+                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                responseSms.append("SSID: ").append(wifiInfo.getSSID()).append("\n");
+                responseSms.append("BSSID: ").append(wifiInfo.getBSSID()).append("\n");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    responseSms.append("Strength: ").append(wifiManager.calculateSignalLevel(wifiInfo.getRssi()))
+                            .append("/").append(wifiManager.getMaxSignalLevel()).append("\n");
+                }
+            }
+
+            responseSms.append("\nNearby networks:");
+            List<ScanResult> scanResults = wifiManager.getScanResults();
+            for(ScanResult scanResult : scanResults){
+                responseSms.append("\n");
+                responseSms.append("SSID: ").append(scanResult.SSID).append("\n");
+                responseSms.append("BSSID: ").append(scanResult.BSSID).append("\n");
+                responseSms.append("Security: ").append(scanResult.capabilities).append("\n");
+            }
+            Utils.sendSms(smsManager, responseSms.toString(), sender);
         }
     }
 }

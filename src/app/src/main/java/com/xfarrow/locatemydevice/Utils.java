@@ -16,6 +16,7 @@ public class Utils {
     public static final String CELLULAR_INFO_OPTION = "cellinfo";
     public static final String BATTERY_OPTION = "battery";
     public static final String CALL_ME_OPTION = "callme";
+    public static final String WIFI_OPTION = "wifi";
 
     public static String getCountryNameByIso(String iso){
         Locale locale = new Locale("", iso);
