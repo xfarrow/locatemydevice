@@ -1,8 +1,11 @@
 package com.xfarrow.locatemydevice;
 
+import static android.content.Context.DEVICE_POLICY_SERVICE;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -58,7 +61,9 @@ public class SmsHandler {
                 + "|"
                 + Utils.CALL_ME_OPTION
                 + "|"
-                + Utils.WIFI_OPTION + "((" + Utils.WIFI_ENABLE_SUBOPTION + ")|(" + Utils.WIFI_DISABLE_SUBOPTION + "))?";
+                + Utils.WIFI_OPTION + "((" + Utils.WIFI_ENABLE_SUBOPTION + ")|(" + Utils.WIFI_DISABLE_SUBOPTION + "))?"
+                + "|"
+                + Utils.LOCK_OPTION;
 
         Pattern pattern = Pattern.compile(regexToMatch);
         Matcher matcher = pattern.matcher(message);
@@ -295,6 +300,21 @@ public class SmsHandler {
             WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             wifiManager.setWifiEnabled(providedOption.contains(Utils.WIFI_ENABLE_SUBOPTION));
             responseSms.append("Command executed");
+            Utils.sendSms(smsManager, responseSms.toString(), sender);
+        }
+
+        // lock
+        else if(providedOption.equals(Utils.LOCK_OPTION)){
+            StringBuilder responseSms = new StringBuilder();
+
+            DevicePolicyManager mgr = (DevicePolicyManager)context.getSystemService(DEVICE_POLICY_SERVICE);
+            if(!mgr.isAdminActive(new ComponentName(context, AdminReceiver.class))){
+                responseSms.append("No admin permission. Aborted");
+                Utils.sendSms(smsManager, responseSms.toString(), sender);
+                return;
+            }
+            mgr.lockNow();
+            responseSms.append("Locked");
             Utils.sendSms(smsManager, responseSms.toString(), sender);
         }
 

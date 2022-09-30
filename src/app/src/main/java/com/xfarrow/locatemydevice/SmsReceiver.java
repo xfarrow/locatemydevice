@@ -11,7 +11,8 @@ import android.widget.Toast;
 
 public class SmsReceiver extends BroadcastReceiver {
     // https://www.vogella.com/tutorials/AndroidBroadcastReceiver/article.html
-    // This method gets fired as soon as it receives an SMS
+    // This method gets fired as soon as it receives an SMS.
+    // Consider using a JobService: https://developer.android.com/topic/performance/vitals/anr#slow_broadcast_receivers
     @Override
     public void onReceive(Context context, Intent intent) {
 

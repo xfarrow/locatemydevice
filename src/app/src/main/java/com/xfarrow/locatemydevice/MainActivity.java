@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -51,8 +53,17 @@ public class MainActivity extends AppCompatActivity {
                     Utils.PERMISSION_MULTIPLE
             );
         }
+
+        // Request display overlay
         if(!android.provider.Settings.canDrawOverlays(this)) {
             displayDrawOverlayPermissionDialog();
+        }
+
+        // Admin permission
+        ComponentName cn = new ComponentName(this, AdminReceiver.class);
+        DevicePolicyManager mgr = (DevicePolicyManager)getSystemService(DEVICE_POLICY_SERVICE);
+        if(!mgr.isAdminActive(cn)){
+            requestAdminPermission(cn);
         }
     }
 
@@ -109,5 +120,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         alert.show();
+    }
+
+    public void requestAdminPermission(ComponentName cn){
+        Intent intent= new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cn);
+        intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "The app requires this" +
+                " permission to provide the 'lock' feature.");
+        startActivity(intent);
     }
 }
