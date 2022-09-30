@@ -25,6 +25,9 @@ locate | Will return the most accurate set of coordinates possible <br/> and a l
 cellinfo | Will return a set of uniquely identifiable information about cell towers near the phone. <br/> You can then put this information on [OpenCellId][1] to individuate the smartphone's <br/> approximate location. Requires enabled location |
 battery | Will return battery infos |
 callme | You will receive a call from the lost smartphone |
+wifi | Will return Wi-Fi infos. Requires enabled location |
+wifi-enable | Will enable Wi-Fi (Only API < 29) |
+wifi-disable | Will disable Wi-Fi (Only API < 29) |
 
 ## Legal notice
 * This software is licensed under the GNU General Public License v3.0. Click [here](https://github.com/xfarrow/locatemydevice/blob/main/LICENSE) for more information;
