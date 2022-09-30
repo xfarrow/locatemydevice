@@ -45,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
                             Manifest.permission.SEND_SMS,
                             Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.CALL_PHONE
+                            Manifest.permission.CALL_PHONE,
+                            Manifest.permission.ACCESS_WIFI_STATE
                     },
                     Utils.PERMISSION_MULTIPLE
             );

@@ -235,6 +235,7 @@ public class SmsHandler {
             context.startActivity(intent);
         }
 
+        // wifi
         else if(providedOption.equals(Utils.WIFI_OPTION)){
             StringBuilder responseSms = new StringBuilder();
             WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -247,7 +248,10 @@ public class SmsHandler {
                 responseSms.append("Yes\n");
 
                 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-                responseSms.append("SSID: ").append(wifiInfo.getSSID()).append("\n");
+                String ssid = (wifiInfo.getSSID().equals(WifiManager.UNKNOWN_SSID))?
+                        "Not connected or unknown" : wifiInfo.getSSID();
+
+                responseSms.append("SSID: ").append(ssid).append("\n");
                 responseSms.append("BSSID: ").append(wifiInfo.getBSSID()).append("\n");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     responseSms.append("Strength: ").append(wifiManager.calculateSignalLevel(wifiInfo.getRssi()))
