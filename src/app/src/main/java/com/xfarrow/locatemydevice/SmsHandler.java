@@ -1,6 +1,7 @@
 package com.xfarrow.locatemydevice;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +37,7 @@ public class SmsHandler {
      * [command] [password] [option]
      *
      */
+    @SuppressLint("ObsoleteSdkInt")
     public void handleSms(String message, String sender, Context context) {
         Settings settings = new Settings(context);
         String password = settings.get(Settings.PASSWORD);
@@ -56,7 +58,7 @@ public class SmsHandler {
                 + "|"
                 + Utils.CALL_ME_OPTION
                 + "|"
-                + Utils.WIFI_OPTION;
+                + Utils.WIFI_OPTION + "((" + Utils.WIFI_ENABLE_SUBOPTION + ")|(" + Utils.WIFI_DISABLE_SUBOPTION + "))?";
 
         Pattern pattern = Pattern.compile(regexToMatch);
         Matcher matcher = pattern.matcher(message);
@@ -238,30 +240,39 @@ public class SmsHandler {
         // wifi
         else if(providedOption.equals(Utils.WIFI_OPTION)){
             StringBuilder responseSms = new StringBuilder();
+
+            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+            if(!locationManager.isLocationEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                responseSms.append("Location is off. Unable to execute command.");
+                Utils.sendSms(smsManager, responseSms.toString(), sender);
+                return;
+            }
+
             WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             responseSms.append("Wifi enabled: ");
 
-            if(!wifiManager.isWifiEnabled()){
+            if (!wifiManager.isWifiEnabled()) {
                 responseSms.append("No");
-            }
-            else{
-                responseSms.append("Yes\n");
-
-                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-                String ssid = (wifiInfo.getSSID().equals(WifiManager.UNKNOWN_SSID))?
-                        "Not connected or unknown" : wifiInfo.getSSID();
-
-                responseSms.append("SSID: ").append(ssid).append("\n");
-                responseSms.append("BSSID: ").append(wifiInfo.getBSSID()).append("\n");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    responseSms.append("Strength: ").append(wifiManager.calculateSignalLevel(wifiInfo.getRssi()))
-                            .append("/").append(wifiManager.getMaxSignalLevel()).append("\n");
-                }
+                Utils.sendSms(smsManager, responseSms.toString(), sender);
+                return;
             }
 
+            responseSms.append("Yes\n");
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            String ssid = (wifiInfo.getSSID().equals(WifiManager.UNKNOWN_SSID)) ?
+                    "Not connected or unknown" : wifiInfo.getSSID();
+            String bssid = (wifiInfo.getBSSID().equals("02:00:00:00:00:00")) ?
+                    "Not connected or unknown" : wifiInfo.getBSSID();
+            responseSms.append("SSID: ").append(ssid).append("\n");
+            responseSms.append("BSSID: ").append(bssid).append("\n");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                responseSms.append("Strength: ").append(wifiManager.calculateSignalLevel(wifiInfo.getRssi()))
+                        .append("/").append(wifiManager.getMaxSignalLevel()).append("\n");
+            }
             responseSms.append("\nNearby networks:");
             List<ScanResult> scanResults = wifiManager.getScanResults();
-            for(ScanResult scanResult : scanResults){
+            for (ScanResult scanResult : scanResults) {
                 responseSms.append("\n");
                 responseSms.append("SSID: ").append(scanResult.SSID).append("\n");
                 responseSms.append("BSSID: ").append(scanResult.BSSID).append("\n");
@@ -269,5 +280,23 @@ public class SmsHandler {
             }
             Utils.sendSms(smsManager, responseSms.toString(), sender);
         }
+
+        // wifi-enabled OR wifi-disabled
+        else if(providedOption.contains(Utils.WIFI_OPTION) && (providedOption.contains(Utils.WIFI_ENABLE_SUBOPTION)
+        || providedOption.contains(Utils.WIFI_DISABLE_SUBOPTION))){
+
+            StringBuilder responseSms = new StringBuilder();
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                responseSms.append("Your device does not support this option.");
+                Utils.sendSms(smsManager, responseSms.toString(), sender);
+                return;
+            }
+
+            WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            wifiManager.setWifiEnabled(providedOption.contains(Utils.WIFI_ENABLE_SUBOPTION));
+            responseSms.append("Command executed");
+            Utils.sendSms(smsManager, responseSms.toString(), sender);
+        }
+
     }
 }

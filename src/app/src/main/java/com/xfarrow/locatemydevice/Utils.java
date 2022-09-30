@@ -17,6 +17,8 @@ public class Utils {
     public static final String BATTERY_OPTION = "battery";
     public static final String CALL_ME_OPTION = "callme";
     public static final String WIFI_OPTION = "wifi";
+    public static final String WIFI_ENABLE_SUBOPTION = "-enable";
+    public static final String WIFI_DISABLE_SUBOPTION = "-disable";
 
     public static String getCountryNameByIso(String iso){
         Locale locale = new Locale("", iso);
