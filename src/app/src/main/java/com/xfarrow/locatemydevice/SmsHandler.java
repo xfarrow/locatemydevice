@@ -63,7 +63,9 @@ public class SmsHandler {
                 + "|"
                 + Utils.WIFI_OPTION + "((" + Utils.WIFI_ENABLE_SUBOPTION + ")|(" + Utils.WIFI_DISABLE_SUBOPTION + "))?"
                 + "|"
-                + Utils.LOCK_OPTION;
+                + Utils.LOCK_OPTION
+                + "|"
+                + Utils.SHOW_MESSAGE_OPTION + "\\s+\"[\\w\\W]*[\"]$";
 
         Pattern pattern = Pattern.compile(regexToMatch);
         Matcher matcher = pattern.matcher(message);
@@ -316,6 +318,17 @@ public class SmsHandler {
             mgr.lockNow();
             responseSms.append("Locked");
             Utils.sendSms(smsManager, responseSms.toString(), sender);
+        }
+
+        //show
+        else if(providedOption.contains(Utils.SHOW_MESSAGE_OPTION)){
+            String messageToDisplay = message.substring(message.indexOf("\"") + 1,
+                    message.lastIndexOf("\""));
+
+            Intent lockScreenMessage = new Intent(context, ShowMessageActivity.class);
+            lockScreenMessage.putExtra(Utils.SHOW_MESSAGE_OPTION, messageToDisplay);
+            lockScreenMessage.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(lockScreenMessage);
         }
 
     }
