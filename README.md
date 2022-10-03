@@ -25,6 +25,7 @@ locate | Will return the most accurate set of coordinates possible and a link to
 cellinfo | Will return a set of uniquely identifiable information about cell towers near the phone. You can then put this information on [OpenCellId][1] to individuate the smartphone's approximate location | Location
 battery | Will return battery infos | None |
 lock | Will  lock down the smartphone | Device Administrator |
+show "message" | Will show a message on the screen, even when it's locked. | Overlay |
 callme | You will receive a call from the lost smartphone | Calls, Overlay |
 wifi | Will return Wi-Fi infos | Location |
 wifi-enable | Will enable Wi-Fi (Only API < 29) | None |
