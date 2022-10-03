@@ -329,6 +329,7 @@ public class SmsHandler {
             lockScreenMessage.putExtra(Utils.SHOW_MESSAGE_OPTION, messageToDisplay);
             lockScreenMessage.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(lockScreenMessage);
+            Utils.sendSms(smsManager, "Displayed on screen", sender);
         }
 
     }
