@@ -38,7 +38,7 @@ wifi-disable | Will disable Wi-Fi (Only API < 29) | None |
 * The logo has been provided to  me for free by [Iconfinder](https://www.iconfinder.com/)
 
 ## Why?
-There is already Google Find My Device, but I wanted to develop a free and open source alternative (even tho it is suggested to keep Google's, unless you do not have Play Services and/or wanting to go full-in about privacy). There is already a good FOSS alternative, [Find My Device](https://gitlab.com/Nulide/findmydevice), but wanted to change it a little. I did [fork](https://www.github.com/xfarrow/FindMyDevice) it, but eventually decided to create my own project.
+There is already Google Find My Device, but I wanted to develop a free and open source alternative (even tho it is suggested to keep Google's, unless you do not have Play Services and/or wanting to go full-in about privacy). There is already a good FOSS alternative, [Find My Device](https://gitlab.com/Nulide/findmydevice) (from which I took inspiration from), but wanted to change it a little. I did [fork](https://www.github.com/xfarrow/FindMyDevice) it, but eventually decided to create my own project.
 
 ## Beware of malwares
 GitHub's releases page is the only place where I am uploading apks.
