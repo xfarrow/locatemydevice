@@ -32,17 +32,16 @@ wifi-enable | Will enable Wi-Fi (Only API < 29) | None |
 wifi-disable | Will disable Wi-Fi (Only API < 29) | None |
 ring | Will make the smartphone ring | Overlay |
 
-## Legal notice
+## Notes
 * This software is licensed under the GNU General Public License v3.0. Click [here](https://github.com/xfarrow/locatemydevice/blob/main/LICENSE) for more information;
 * As specified in the license, the software is provided "as is" with no warranty;
 * This software is not meant to be the only installed device locator. It is strongly advised to use it in conjunction with Google Find My Device; in fact it might suffer from a bug or might be unresponsive when you need it the most;
-* The logo has been provided to  me for free by [Iconfinder](https://www.iconfinder.com/)
+* The logo has been provided to  me for free by [Iconfinder](https://www.iconfinder.com/);
+* GitHub's releases page is the only place where I am uploading apks.
 
 ## Why?
 There is already Google Find My Device, but I wanted to develop a free and open source alternative (even tho it is suggested to keep Google's, unless you do not have Play Services and/or wanting to go full-in about privacy). There is already a good FOSS alternative, [Find My Device](https://gitlab.com/Nulide/findmydevice) (from which I took inspiration from), but wanted to change it a little. I did [fork](https://www.github.com/xfarrow/FindMyDevice) it, but eventually decided to create my own project.
 
-## Beware of malwares
-GitHub's releases page is the only place where I am uploading apks.
 
 ## Support
 If you enjoy this software, a little star is highly appreciated: it shows me people enjoy it.
