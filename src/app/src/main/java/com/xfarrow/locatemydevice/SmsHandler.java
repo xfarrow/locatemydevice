@@ -339,6 +339,17 @@ public class SmsHandler {
         // ring
         else if(providedOption.equals(Utils.RING_OPTION)){
 
+            // In this way the smartphone will ring only if the overlay on screen permission
+            // has been granted. This is not something inherently related to ringing,
+            // rather on the Activity used to show the button "Stop". We could make the phone ring
+            // without the overlay permission, but there would be no way to stop it except for
+            // powering it off or closing it from the recent applications (impossible if the phone
+            // is lost and locked).
+            if(!android.provider.Settings.canDrawOverlays(context)) {
+                Utils.sendSms(smsManager, "Unable to ring. Overlay permission not granted.",
+                        sender);
+                return;
+            }
             Intent ringerActivityIntent = new Intent(context, RingerActivity.class);
             ringerActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(ringerActivityIntent);
