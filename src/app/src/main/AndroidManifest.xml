@@ -23,7 +23,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LocateMyDevice"
         tools:targetApi="30">
-
+        <activity
+            android:name=".RingerActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".ShowMessageActivity"
             android:exported="false"
@@ -31,8 +37,7 @@
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
-        </activity>
-        <!-- https://developer.android.com/guide/topics/manifest/receiver-element -->
+        </activity> <!-- https://developer.android.com/guide/topics/manifest/receiver-element -->
         <receiver
             android:name=".SmsReceiver"
             android:directBootAware="true"

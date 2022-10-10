@@ -14,6 +14,8 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
@@ -65,7 +67,9 @@ public class SmsHandler {
                 + "|"
                 + Utils.LOCK_OPTION
                 + "|"
-                + Utils.SHOW_MESSAGE_OPTION + "\\s+\"[\\w\\W]*[\"]$";
+                + Utils.SHOW_MESSAGE_OPTION + "\\s+\"[\\w\\W]*[\"]$"
+                + "|"
+                + Utils.RING_OPTION;
 
         Pattern pattern = Pattern.compile(regexToMatch);
         Matcher matcher = pattern.matcher(message);
@@ -320,7 +324,7 @@ public class SmsHandler {
             Utils.sendSms(smsManager, responseSms.toString(), sender);
         }
 
-        //show
+        // show
         else if(providedOption.contains(Utils.SHOW_MESSAGE_OPTION)){
             String messageToDisplay = message.substring(message.indexOf("\"") + 1,
                     message.lastIndexOf("\""));
@@ -332,5 +336,14 @@ public class SmsHandler {
             Utils.sendSms(smsManager, "Displayed on screen", sender);
         }
 
+        // ring
+        else if(providedOption.equals(Utils.RING_OPTION)){
+
+            Intent ringerActivityIntent = new Intent(context, RingerActivity.class);
+            ringerActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(ringerActivityIntent);
+
+            Utils.sendSms(smsManager, "Ringing", sender);
+        }
     }
 }

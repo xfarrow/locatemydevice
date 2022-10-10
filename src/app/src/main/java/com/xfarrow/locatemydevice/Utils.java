@@ -19,6 +19,7 @@ public class Utils {
     public static final String WIFI_OPTION = "wifi";
     public static final String LOCK_OPTION = "lock";
     public static final String SHOW_MESSAGE_OPTION = "show";
+    public static final String RING_OPTION = "ring";
     public static final String WIFI_ENABLE_SUBOPTION = "-enable";
     public static final String WIFI_DISABLE_SUBOPTION = "-disable";
 

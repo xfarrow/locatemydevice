@@ -1,5 +1,6 @@
 package com.xfarrow.locatemydevice;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +22,7 @@ public class ShowMessageActivity extends AppCompatActivity {
     }
 
     // https://stackoverflow.com/questions/35356848/android-how-to-launch-activity-over-lock-screen
+    @SuppressLint("ObsoleteSdkInt")
     private void showOnLockscreen(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1)
         {
