@@ -30,6 +30,7 @@ callme | You will receive a call from the lost smartphone | Calls, Overlay |
 wifi | Will return Wi-Fi infos | Location |
 wifi-enable | Will enable Wi-Fi (Only API < 29) | None |
 wifi-disable | Will disable Wi-Fi (Only API < 29) | None |
+ring | Will make the smartphone ring | Overlay |
 
 ## Legal notice
 * This software is licensed under the GNU General Public License v3.0. Click [here](https://github.com/xfarrow/locatemydevice/blob/main/LICENSE) for more information;
