@@ -1,5 +1,7 @@
 # Locate My Device
-This app helps to locate a lost smartphone through the use of conventional SMS. **It is in beta and under active development**
+This app helps to locate a lost smartphone through the use of conventional SMS. 
+
+**This project is in beta and under active development**
 
 ## Screenshots
 | Homescreen | SMS Chat
