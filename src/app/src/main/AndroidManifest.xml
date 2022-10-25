@@ -24,6 +24,13 @@
         android:theme="@style/Theme.LocateMyDevice"
         tools:targetApi="30">
         <activity
+            android:name=".AppInfoActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".WhitelistContactsActivity"
             android:exported="false">
             <meta-data

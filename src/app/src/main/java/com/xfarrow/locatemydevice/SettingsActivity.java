@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch whitelistSwitch;
     private Button addContactsButton;
     private Settings settings;
+    private LinearLayout infoLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
         editTextLmdCommand = findViewById(R.id.editTextLmdCommand);
         whitelistSwitch = findViewById(R.id.SwitchWhitelist);
         addContactsButton = findViewById(R.id.buttonAddContacts);
+        infoLinearLayout = findViewById(R.id.info_layout);
 
         addContactsButton.setEnabled(Boolean.parseBoolean(settings.get(Settings.WHITELIST_ENABLED)));
         whitelistSwitch.setChecked(Boolean.parseBoolean(settings.get(Settings.WHITELIST_ENABLED)));
@@ -131,6 +134,14 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent myIntent = new Intent(SettingsActivity.this, WhitelistContactsActivity.class);
+                SettingsActivity.this.startActivity(myIntent);
+            }
+        });
+
+        infoLinearLayout.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(SettingsActivity.this, AppInfoActivity.class);
                 SettingsActivity.this.startActivity(myIntent);
             }
         });
