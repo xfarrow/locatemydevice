@@ -44,7 +44,7 @@ There is already Google Find My Device, but I wanted to develop a free and open 
 
 
 ## Support
-If you enjoy this software, a little star is highly appreciated: it shows me people enjoy it.
+If you enjoy this software, a little star is highly appreciated: it shows me people are interested in it.
 
 You can also donate if you want to, using the button below
 
