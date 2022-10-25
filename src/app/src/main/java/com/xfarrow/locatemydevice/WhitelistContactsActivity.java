@@ -23,7 +23,7 @@ public class WhitelistContactsActivity extends AppCompatActivity {
     private ListView contactsListView;
     private ArrayList<String> contacts;
     private ArrayAdapter<String> listviewAdapter;
-    private WhitelistDbHandler whitelistDbHandler = new WhitelistDbHandler(this);
+    private final WhitelistDbHandler whitelistDbHandler = new WhitelistDbHandler(this);
 
     private static final int CONTACT_PICK_CODE = 123;
 
@@ -67,7 +67,7 @@ public class WhitelistContactsActivity extends AppCompatActivity {
 
     }
 
-    // Add "add" button on the top
+    // Add "add contact" button on the top
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_add, menu);
@@ -91,7 +91,7 @@ public class WhitelistContactsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult (int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK && requestCode == 123) {
+        if (resultCode == Activity.RESULT_OK && requestCode == CONTACT_PICK_CODE) {
             Uri contactData = data.getData();
             Cursor c = getContentResolver().query(contactData, null, null, null, null);
             if (c.moveToFirst()) {
