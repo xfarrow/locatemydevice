@@ -54,11 +54,10 @@ public class WhitelistDbHandler extends SQLiteOpenHelper {
     }
 
     public ArrayList<String> getAllContacts() {
-        ArrayList<String> array_list = new ArrayList<String>();
-
-        //hp = new HashMap();
+        ArrayList<String> array_list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor =  db.rawQuery( "select * from " + TABLE_CONTACTS, null );
+        String query = String.format("SELECT %s FROM %s", KEY_PH_NO, TABLE_CONTACTS);
+        Cursor cursor =  db.rawQuery( query, null );
         cursor.moveToFirst();
 
         int columnIndex = cursor.getColumnIndex(KEY_PH_NO);
@@ -102,5 +101,4 @@ public class WhitelistDbHandler extends SQLiteOpenHelper {
         cursor.close();
         return count > 0;
     }
-
 }

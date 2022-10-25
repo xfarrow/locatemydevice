@@ -108,7 +108,8 @@ public class WhitelistContactsActivity extends AppCompatActivity {
     private void contactSelected(String phoneNo){
         // We'll replace parenthesis, dashes and whitespaces to obtain a valid phone number
         phoneNo = phoneNo.replaceAll("[-()\\s]", "");
-        if(whitelistDbHandler.isContactPresent(phoneNo)){
+
+        if(contacts.contains(phoneNo)){
             Toast.makeText(this, "Contact already in the list", Toast.LENGTH_SHORT).show();
             return;
         }
