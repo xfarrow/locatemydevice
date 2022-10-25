@@ -49,7 +49,7 @@ public class WhitelistDbHandler extends SQLiteOpenHelper {
     // Deleting single contact
     public void deleteContact(String phoneNo) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_CONTACTS, KEY_ID + " = ?", new String[] { phoneNo });
+        db.delete(TABLE_CONTACTS, KEY_PH_NO + " = ?", new String[] { phoneNo });
         db.close();
     }
 
