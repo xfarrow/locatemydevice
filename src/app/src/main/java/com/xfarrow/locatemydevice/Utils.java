@@ -2,8 +2,12 @@ package com.xfarrow.locatemydevice;
 
 import android.telephony.SmsManager;
 
+import androidx.annotation.Nullable;
+
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
 
 public class Utils {
@@ -41,6 +45,18 @@ public class Utils {
                 .append(longitude)
                 .append("\n")
                 .append("https://www.openstreetmap.org/?mlat=").append(latitude).append("&mlon=").append(longitude).toString();
+    }
+
+    @Nullable
+    public static String extractCountryCodeFromPhoneNumber(String phoneNumber){
+        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        Phonenumber.PhoneNumber numberProto;
+        try {
+            numberProto = phoneUtil.parse(phoneNumber, "");
+        } catch (NumberParseException e) {
+            return null;
+        }
+        return String.valueOf(numberProto.getCountryCode());
     }
 
 }

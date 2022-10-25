@@ -71,9 +71,32 @@ public class WhitelistDbHandler extends SQLiteOpenHelper {
         return array_list;
     }
 
+    /*
+    * Checks if a contact is already in the database.
+    *
+    * If a phoneNumber with an international country code is provided, checks if exists the same
+    * number without the country code. This is very useful if the user stores in the whitelist a
+    * number without the international country code because it'll be checked against the SMS sender's
+    * number obtained from the Broadcast, always containing an international country code.
+    */
     public boolean isContactPresent(String phoneNo){
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "Select * from " + TABLE_CONTACTS + " where " + KEY_PH_NO + " = " + "\"" + phoneNo + "\"";
+        // SELECT KEY_PH_NO FROM TABLE_CONTACTS WHERE KEY_PH_NO = "phoneNo" OR KEY_PH_NO = "phoneNumberWithoutPrefix"
+        String query = String.format("SELECT %s FROM %s WHERE %s = \"%s\"",
+                KEY_PH_NO,
+                TABLE_CONTACTS,
+                KEY_PH_NO,
+                phoneNo
+                );
+
+        String countryCode = Utils.extractCountryCodeFromPhoneNumber(phoneNo);
+        if(countryCode != null){
+            String phoneNumberWithoutPrefix = phoneNo.replace("+", "").replace(countryCode, "");
+            query += String.format(" OR %s = \"%s\"",
+                    KEY_PH_NO,
+                    phoneNumberWithoutPrefix);
+        }
+
         Cursor cursor = db.rawQuery(query, null);
         int count = cursor.getCount();
         cursor.close();
