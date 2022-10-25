@@ -60,11 +60,48 @@
             <EditText
                 android:id="@+id/editTextLmdCommand"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:ems="10"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:text="LMD" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="17sp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Whitelist" />
+
+            <Switch
+                android:id="@+id/SwitchWhitelist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enabled"
+                android:layout_marginStart="10dp"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Only contacts in the whitelist are allowed to communicate with this smartphone"/>
+
+            <Button
+                android:id="@+id/buttonAddContacts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="Add contacts"/>
+
         </LinearLayout>
     </ScrollView>
 

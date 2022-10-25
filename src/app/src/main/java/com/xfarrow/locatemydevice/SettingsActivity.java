@@ -1,13 +1,17 @@
 package com.xfarrow.locatemydevice;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -17,6 +21,9 @@ public class SettingsActivity extends AppCompatActivity {
 
     private Button buttonEnterPin;
     private EditText editTextLmdCommand;
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
+    private Switch whitelistSwitch;
+    private Button addContactsButton;
     private Settings settings;
 
     @Override
@@ -24,6 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
         settings = new Settings(this);
+
         setViews();
         setValues();
         setListeners();
@@ -32,6 +40,11 @@ public class SettingsActivity extends AppCompatActivity {
     private void setViews(){
         buttonEnterPin = findViewById(R.id.buttonEnterPassword);
         editTextLmdCommand = findViewById(R.id.editTextLmdCommand);
+        whitelistSwitch = findViewById(R.id.SwitchWhitelist);
+        addContactsButton = findViewById(R.id.buttonAddContacts);
+
+        addContactsButton.setEnabled(Boolean.parseBoolean(settings.get(Settings.WHITELIST_ENABLED)));
+        whitelistSwitch.setChecked(Boolean.parseBoolean(settings.get(Settings.WHITELIST_ENABLED)));
     }
 
     private void setValues(){
@@ -105,5 +118,22 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             }
         });
+
+        whitelistSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                addContactsButton.setEnabled(isChecked);
+                settings.set(Settings.WHITELIST_ENABLED, String.valueOf(isChecked));
+            }
+        });
+
+        addContactsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(SettingsActivity.this, WhitelistContactsActivity.class);
+                SettingsActivity.this.startActivity(myIntent);
+            }
+        });
+
     }
 }

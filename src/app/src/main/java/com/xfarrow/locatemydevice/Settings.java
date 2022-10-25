@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 public class Settings {
     public static final int PASSWORD = 0;
     public static final int SMS_COMMAND = 1;
+    public static final int WHITELIST_ENABLED = 2;
 
     private final SharedPreferences sharedPreferences;
 
@@ -29,6 +30,8 @@ public class Settings {
                 return CipherUtils.get256Sha("0000");
             case SMS_COMMAND:
                 return "LMD";
+            case WHITELIST_ENABLED:
+                return "false";
         }
         return null;
     }

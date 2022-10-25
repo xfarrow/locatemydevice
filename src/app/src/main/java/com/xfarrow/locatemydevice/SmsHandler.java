@@ -50,6 +50,12 @@ public class SmsHandler {
         String providedOption = "";
         String providedPassword = "";
 
+        // Deny communication to those not in the whitelist, if enabled
+        WhitelistDbHandler whitelistDbHandler = new WhitelistDbHandler(context);
+        if(Boolean.parseBoolean(settings.get(Settings.WHITELIST_ENABLED)) && !whitelistDbHandler.isContactPresent(sender)){
+            return;
+        }
+
         String regexToMatch = "^"
                 + command
                 + "\\s"
