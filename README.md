@@ -32,16 +32,22 @@ wifi-enable | Will enable Wi-Fi (Only API < 29) | None |
 wifi-disable | Will disable Wi-Fi (Only API < 29) | None |
 ring | Will make the smartphone ring | Overlay |
 
-## Notes
+## Security
+This application manages sensitive data. As such, it strives to be as secure as possible. There are two walls to resist a potential malicious individual:
+* Password (mandatory): The default password is ```0000```. Change it to something more secure to enhance your protection. Furthermore, you probably know that SMS are not encrypted. This means that it is advised to change your password when you send to your smartphone messages containing it in order to deny access to attackers as soon as possible (unlikely and costly attack, yet let's try to prevent any displeasing scenario).
+* Whitelist (optional): Whitelist numbers are the only numbers that the app will accept communications from.
+
+### Legit apks
+GitHub's releases section is the only place where I am uploading apks.
+
+## More info
+There is already Google Find My Device, but I wanted to develop a free and open source alternative (even tho it is suggested to keep Google's, unless you do not have Play Services and/or wanting to go full-in about privacy). There is already a good FOSS alternative, [Find My Device](https://gitlab.com/Nulide/findmydevice) (from which I took inspiration from), but wanted to change it a little. I did [fork](https://www.github.com/xfarrow/FindMyDevice) it, but eventually decided to create my own project.
+
+**Other:**
 * This software is licensed under the GNU General Public License v3.0. Click [here](https://github.com/xfarrow/locatemydevice/blob/main/LICENSE) for more information;
 * As specified in the license, the software is provided "as is" with no warranty;
 * This software is not meant to be the only installed device locator. It is strongly advised to use it in conjunction with Google Find My Device; in fact it might suffer from a bug or might be unresponsive when you need it the most;
 * The logo has been provided to  me for free by [Iconfinder](https://www.iconfinder.com/);
-* GitHub's releases page is the only place where I am uploading apks.
-
-## Why?
-There is already Google Find My Device, but I wanted to develop a free and open source alternative (even tho it is suggested to keep Google's, unless you do not have Play Services and/or wanting to go full-in about privacy). There is already a good FOSS alternative, [Find My Device](https://gitlab.com/Nulide/findmydevice) (from which I took inspiration from), but wanted to change it a little. I did [fork](https://www.github.com/xfarrow/FindMyDevice) it, but eventually decided to create my own project.
-
 
 ## Support
 If you enjoy this software, a little star is highly appreciated: it shows me people are interested in it.
