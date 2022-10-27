@@ -3,11 +3,14 @@ package com.xfarrow.locatemydevice;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -15,7 +18,7 @@ import android.widget.Button;
 public class RingerActivity extends AppCompatActivity {
 
     private Ringtone ringtoneManager;
-
+    private Vibrator v;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,10 +59,27 @@ public class RingerActivity extends AppCompatActivity {
         ringtoneManager = RingtoneManager.getRingtone(this, ringtone);
         ringtoneManager.setVolume(1f);
         ringtoneManager.play();
+
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        // Start without a delay
+        // Vibrate for 500 milliseconds
+        // Sleep for 500 milliseconds
+        long[] pattern = {0, 500, 500};
+        // The '0' here means to repeat indefinitely
+        // '0' is actually the index at which the pattern keeps repeating from (the start)
+        // To repeat the pattern from any other point, you could increase the index, e.g. '1'
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createWaveform(pattern, 0));
+        }
+        else{
+            v.vibrate(pattern,0);
+        }
     }
 
     private void stopRinging(){
         ringtoneManager.stop();
+        v.cancel();
         finishAffinity();
     }
 
