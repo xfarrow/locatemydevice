@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class WhitelistContactsActivity extends AppCompatActivity {
 
     private ListView contactsListView;
-    private ArrayList<String> contacts;
+    private ArrayList<String> contactsListView_datasource;
     private ArrayAdapter<String> listviewAdapter;
     private final WhitelistDbHandler whitelistDbHandler = new WhitelistDbHandler(this);
 
@@ -35,10 +35,10 @@ public class WhitelistContactsActivity extends AppCompatActivity {
         setViews();
         setListeners();
 
-        contacts = whitelistDbHandler.getAllContacts();
+        contactsListView_datasource = whitelistDbHandler.getAllContacts();
         listviewAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1,
-                contacts);
+                contactsListView_datasource);
         contactsListView.setAdapter(listviewAdapter);
     }
 
@@ -58,9 +58,7 @@ public class WhitelistContactsActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String number = (String)adapterView.getItemAtPosition(i);
-                contacts.remove(number);
-                listviewAdapter.notifyDataSetChanged();
-                whitelistDbHandler.deleteContact(number);
+                removeNumberFromWhiteList(number);
                 return true;
             }
         });
@@ -98,23 +96,27 @@ public class WhitelistContactsActivity extends AppCompatActivity {
                 int phoneIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
                 int contactNameIndex = c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
                 String number = c.getString(phoneIndex);
-                String contactName = c.getString(contactNameIndex);
-                contactSelected(number);
+                String contactName = c.getString(contactNameIndex); // planned to show contact's name as well
+                addNumberToWhiteList(number);
             }
             c.close();
         }
     }
 
-    private void contactSelected(String phoneNo){
-        // We'll replace parenthesis, dashes and whitespaces to obtain a valid phone number
-        phoneNo = phoneNo.replaceAll("[-()\\s]", "");
-
-        if(contacts.contains(phoneNo)){
+    private void addNumberToWhiteList(String phoneNo){
+        phoneNo = Utils.normalizePhoneNumber(phoneNo);
+        if(contactsListView_datasource.contains(phoneNo)){
             Toast.makeText(this, "Contact already in the list", Toast.LENGTH_SHORT).show();
             return;
         }
         whitelistDbHandler.addContact(phoneNo);
-        contacts.add(phoneNo);
+        contactsListView_datasource.add(phoneNo);
+        listviewAdapter.notifyDataSetChanged();
+    }
+
+    private void removeNumberFromWhiteList(String phoneNo){
+        whitelistDbHandler.deleteContact(phoneNo);
+        contactsListView_datasource.remove(phoneNo);
         listviewAdapter.notifyDataSetChanged();
     }
 }

@@ -18,7 +18,7 @@ import android.widget.Button;
 public class RingerActivity extends AppCompatActivity {
 
     private Ringtone ringtoneManager;
-    private Vibrator v;
+    private Vibrator vibrator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +60,7 @@ public class RingerActivity extends AppCompatActivity {
         ringtoneManager.setVolume(1f);
         ringtoneManager.play();
 
-        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         // Start without a delay
         // Vibrate for 500 milliseconds
@@ -70,17 +70,17 @@ public class RingerActivity extends AppCompatActivity {
         // '0' is actually the index at which the pattern keeps repeating from (the start)
         // To repeat the pattern from any other point, you could increase the index, e.g. '1'
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createWaveform(pattern, 0));
+            vibrator.vibrate(VibrationEffect.createWaveform(pattern, 0));
         }
         else{
-            v.vibrate(pattern,0);
+            vibrator.vibrate(pattern,0);
         }
     }
 
     private void stopRinging(){
         ringtoneManager.stop();
-        v.cancel();
-        finishAffinity();
+        vibrator.cancel();
+        finishAndRemoveTask();
     }
 
     @Override

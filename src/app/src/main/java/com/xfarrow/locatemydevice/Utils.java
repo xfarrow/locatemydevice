@@ -59,4 +59,9 @@ public class Utils {
         return String.valueOf(numberProto.getCountryCode());
     }
 
+    // We'll remove parenthesis, dashes and whitespaces
+    public static String normalizePhoneNumber(String phoneNo){
+        return phoneNo.replaceAll("[-()\\s]", "");
+    }
+
 }
