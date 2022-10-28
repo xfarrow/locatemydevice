@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Locate my device</string>
+    <string name="sms_command">SMS command</string>
+    <string name="sms_command_description">Choose a command to initialize the conversation with the smartphone</string>
+    <string name="password">Password</string>
+    <string name="choose_a_password">Choose a password</string>
+    <string name="enter_password">Enter password</string>
+    <string name="whitelist">Whitelist</string>
+    <string name="enabled">Enabled</string>
+    <string name="whitelist_description">Only contacts in the whitelist are allowed to communicate with this smartphone</string>
+    <string name="whitelist_contacts">Whitelist contacts</string>
+    <string name="info">Info</string>
+    <string name="click_here_for_more_info">Click here for more info</string>
+    <string name="app_version">App version:</string>
+    <string name="app_open_source_description">This software is open source and licensed under GPLv3\n\nSource code and instructions at\nhttps://www.github.com/xfarrow/locatemydevice</string>
+    <string name="locate_my_device_is_running">Locate my device is running</string>
+    <string name="display_over_other_apps">Display over other apps</string>
+    <string name="display_over_other_apps_request_description">Please, enable \'Display over other apps\' permission. It is required for using the options \'callme\' and \'show\'</string>
+    <string name="cancel">Cancel</string>
+    <string name="admin_permission_request_description">The app requires this permission to provide the \'lock\' feature.</string>
+    <string name="cannot_use_a_blank_password">Cannot use a blank password. Aborted.</string>
+    <string name="empty_sms_command_not_allowed">Empty SMS command not allowed, reverted to default (LMD)</string>
+    <string name="long_click_to_delete">Long click to delete</string>
+    <string name="contact_already_in_the_list">Contact already in the list</string>
 </resources>

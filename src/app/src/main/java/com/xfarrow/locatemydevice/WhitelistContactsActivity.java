@@ -31,7 +31,7 @@ public class WhitelistContactsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_whitelist_contacts);
-        setTitle("Whitelist");
+        setTitle(R.string.whitelist);
         setViews();
         setListeners();
 
@@ -50,7 +50,7 @@ public class WhitelistContactsActivity extends AppCompatActivity {
         contactsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(WhitelistContactsActivity.this, "Long click to delete", Toast.LENGTH_SHORT).show();
+                Toast.makeText(WhitelistContactsActivity.this, R.string.long_click_to_delete, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -106,7 +106,7 @@ public class WhitelistContactsActivity extends AppCompatActivity {
     private void addNumberToWhiteList(String phoneNo){
         phoneNo = Utils.normalizePhoneNumber(phoneNo);
         if(contactsListView_datasource.contains(phoneNo)){
-            Toast.makeText(this, "Contact already in the list", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.contact_already_in_the_list, Toast.LENGTH_SHORT).show();
             return;
         }
         whitelistDbHandler.addContact(phoneNo);

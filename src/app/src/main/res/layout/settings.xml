@@ -21,13 +21,13 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:textSize="17sp"
-                android:text="SMS command" />
+                android:text="@string/sms_command" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="Choose a command to initialize the conversation with the smartphone" />
+                android:text="@string/sms_command_description" />
 
             <EditText
                 android:id="@+id/editTextLmdCommand"
@@ -50,13 +50,13 @@
                 android:textSize="17sp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:text="Password" />
+                android:text="@string/password" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="Choose a Password" />
+                android:text="@string/choose_a_password" />
 
             <Button
                 android:id="@+id/buttonEnterPassword"
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:text="Enter Password"/>
+                android:text="@string/enter_password"/>
 
             <View
                 android:layout_width="match_parent"
@@ -78,13 +78,13 @@
                 android:textSize="17sp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:text="Whitelist" />
+                android:text="@string/whitelist" />
 
             <Switch
                 android:id="@+id/SwitchWhitelist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Enabled"
+                android:text="@string/enabled"
                 android:layout_marginStart="10dp"
                 tools:ignore="UseSwitchCompatOrMaterialXml" />
 
@@ -92,7 +92,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="Only contacts in the whitelist are allowed to communicate with this smartphone"/>
+                android:text="@string/whitelist_description"/>
 
             <Button
                 android:id="@+id/buttonAddContacts"
@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:text="Whitelist contacts"/>
+                android:text="@string/whitelist_contacts"/>
 
             <View
                 android:layout_width="match_parent"
@@ -121,18 +121,20 @@
                 android:textSize="17sp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:text="Info" />
+                android:text="@string/info" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="Click here for more info"/>
+                android:text="@string/click_here_for_more_info"/>
 
         </LinearLayout>
 
-
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
         </LinearLayout>
     </ScrollView>
 

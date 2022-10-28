@@ -69,9 +69,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void displayDrawOverlayPermissionDialog(){
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Display over other apps");
-        alert.setMessage("Please, enable 'Display over other apps' permission. " +
-                "It is required for using the option 'callme'");
+        alert.setTitle(R.string.display_over_other_apps);
+        alert.setMessage(R.string.display_over_other_apps_request_description);
 
         alert.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -80,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        alert.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.cancel();
@@ -92,8 +91,7 @@ public class MainActivity extends AppCompatActivity {
     public void requestAdminPermission(ComponentName cn){
         Intent intent= new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
         intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cn);
-        intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "The app requires this" +
-                " permission to provide the 'lock' feature.");
+        intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, R.string.admin_permission_request_description);
         startActivity(intent);
     }
 

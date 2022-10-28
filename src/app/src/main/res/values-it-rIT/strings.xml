@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sms_command">Comando SMS</string>
+    <string name="sms_command_description">Scegli un comando con cui inizializzare la conversazione con lo smartphone</string>
+    <string name="choose_a_password">Scegli una password</string>
+    <string name="enter_password">Inserisci password</string>
+    <string name="whitelist">Lista bianca</string>
+    <string name="enabled">Abilitata</string>
+    <string name="whitelist_description">Solo i contatti nella lista bianca sono autorizzati a comunicare con questo smartphone</string>
+    <string name="whitelist_contacts">Contatti in lista bianca</string>
+    <string name="info">Info</string>
+    <string name="click_here_for_more_info">Clicca qui per più info</string>
+    <string name="password">Password</string>
+    <string name="app_version">Versione app:</string>
+    <string name="app_open_source_description">Questo software è open source ed è sotto licenza GPLv3\n\nCodice sorgente ed istruzioni a\nhttps://www.github.com/xfarrow/locatemydevice</string>
+    <string name="app_name">Trova il mio dispositivo</string>
+    <string name="locate_my_device_is_running">Trova il mio dispositivo è in esecuzione</string>
+    <string name="display_over_other_apps">Mostra sulle altre app</string>
+    <string name="display_over_other_apps_request_description">Per favore, abilita l\'opzione \'mostra sulle altre app\'. Ciò è richiesto per le opzioni \'callme\' e \'show\'</string>
+    <string name="cancel">Annulla</string>
+    <string name="admin_permission_request_description">L\'app richiede questo permesso per utilizzare l\'opzione \'lock\'</string>
+    <string name="cannot_use_a_blank_password">Non è possibile usare una password vuota. Operazione annullata.</string>
+    <string name="empty_sms_command_not_allowed">Non è consentito usare un comando SMS vuoto. Ripristinato il valore di default (LMD)</string>
+    <string name="long_click_to_delete">Click prolungato per cancellare</string>
+    <string name="contact_already_in_the_list">Contatto già presente nella lista</string>
+</resources>

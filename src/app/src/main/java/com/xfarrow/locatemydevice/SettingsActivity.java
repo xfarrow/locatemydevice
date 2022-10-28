@@ -59,8 +59,8 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder alert = new AlertDialog.Builder(SettingsActivity.this);
-                alert.setTitle("Password");
-                alert.setMessage("Enter Password");
+                alert.setTitle(R.string.password);
+                alert.setMessage(R.string.choose_a_password);
                 EditText input = new EditText(SettingsActivity.this);
                 input.setTransformationMethod(new PasswordTransformationMethod());
                 alert.setView(input);
@@ -72,12 +72,12 @@ public class SettingsActivity extends AppCompatActivity {
                             settings.set(Settings.PASSWORD, CipherUtils.get256Sha(text));
                         }
                         else{
-                            Toast.makeText(SettingsActivity.this, "Cannot use a blank password. Aborted!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(SettingsActivity.this, R.string.cannot_use_a_blank_password, Toast.LENGTH_LONG).show();
                         }
                     }
                 });
 
-                alert.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                alert.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
@@ -114,7 +114,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.toString().isEmpty()) {
-                    Toast.makeText(SettingsActivity.this, "Empty SMS command not allowed, reverted to default (LMD)", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SettingsActivity.this, R.string.empty_sms_command_not_allowed, Toast.LENGTH_LONG).show();
                     settings.set(Settings.SMS_COMMAND, settings.defaultValues(Settings.SMS_COMMAND));
                 } else {
                     settings.set(Settings.SMS_COMMAND, s.toString());

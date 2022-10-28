@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:text="This software is open source licensed under General Public License v3.0\n\nSource code and instructions at\nhttps://www.github.com/xfarrow/locatemydevice"
+        android:text="@string/app_open_source_description"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
