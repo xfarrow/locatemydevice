@@ -102,8 +102,7 @@ public class WhitelistContactsActivity extends AppCompatActivity {
             alert.setNeutralButton(R.string.choose_from_contacts,new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    Intent pickContact = new Intent(Intent.ACTION_PICK);
-                    pickContact.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+                    Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
                     startActivityForResult(pickContact, CONTACT_PICK_CODE);
                 }
             });
@@ -125,7 +124,11 @@ public class WhitelistContactsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == CONTACT_PICK_CODE) {
             Uri contactData = data.getData();
-            Cursor c = getContentResolver().query(contactData, null, null, null, null);
+            String[] projection = {
+                    ContactsContract.CommonDataKinds.Phone.NUMBER,
+                    ContactsContract.Contacts.DISPLAY_NAME
+            };
+            Cursor c = getContentResolver().query(contactData, projection, null, null, null);
             if (c.moveToFirst()) {
                 int phoneIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
                 int contactNameIndex = c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
