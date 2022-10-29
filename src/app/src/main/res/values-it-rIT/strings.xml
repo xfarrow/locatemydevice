@@ -23,4 +23,10 @@
     <string name="empty_sms_command_not_allowed">Non è consentito usare un comando SMS vuoto. Ripristinato il valore di default (LMD)</string>
     <string name="long_click_to_delete">Click prolungato per cancellare</string>
     <string name="contact_already_in_the_list">Contatto già presente nella lista</string>
+    <string name="unable_to_retrieve_contact_error">Impossibile recuperare il contatto. Stai per caso usando un gestore contatti di terze parti? Se così fosse, prova a usare quella di default</string>
+    <string name="add_contact">Aggiungi un contatto</string>
+    <string name="type_a_phone_number">Inserisci un numero di telefono</string>
+    <string name="choose_from_contacts">Scegli dai contatti</string>
+    <string name="phone_number_not_valid">Questo numero non appare essere valido</string>
+    <string name="settings">Impostazioni</string>
 </resources>

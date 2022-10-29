@@ -1,18 +1,24 @@
 package com.xfarrow.locatemydevice;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.telephony.PhoneNumberUtils;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -78,9 +84,37 @@ public class WhitelistContactsActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.add_button) {
-            Intent pickContact = new Intent(Intent.ACTION_PICK);
-            pickContact.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-            startActivityForResult(pickContact, CONTACT_PICK_CODE);
+            AlertDialog.Builder alert = new AlertDialog.Builder(WhitelistContactsActivity.this);
+            alert.setTitle(R.string.add_contact);
+            alert.setMessage(R.string.type_a_phone_number);
+
+            EditText input = new EditText(WhitelistContactsActivity.this);
+            input.setInputType(InputType.TYPE_CLASS_PHONE);
+            alert.setView(input);
+
+            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    String chosenPhoneNumber = input.getText().toString();
+                    addNumberToWhiteList(chosenPhoneNumber);
+                }
+            });
+
+            alert.setNeutralButton(R.string.choose_from_contacts,new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Intent pickContact = new Intent(Intent.ACTION_PICK);
+                    pickContact.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+                    startActivityForResult(pickContact, CONTACT_PICK_CODE);
+                }
+            });
+
+            alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.cancel();
+                }
+            });
+            alert.show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -95,8 +129,12 @@ public class WhitelistContactsActivity extends AppCompatActivity {
             if (c.moveToFirst()) {
                 int phoneIndex = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
                 int contactNameIndex = c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
+                if(phoneIndex < 0){
+                    Toast.makeText(this, R.string.unable_to_retrieve_contact_error, Toast.LENGTH_LONG).show();
+                    return;
+                }
                 String number = c.getString(phoneIndex);
-                String contactName = c.getString(contactNameIndex); // planned to show contact's name as well
+                String contactName = (phoneIndex > 0)?  c.getString(contactNameIndex) : "unknown"; // planned to show contact's name as well
                 addNumberToWhiteList(number);
             }
             c.close();
@@ -105,6 +143,11 @@ public class WhitelistContactsActivity extends AppCompatActivity {
 
     private void addNumberToWhiteList(String phoneNo){
         phoneNo = Utils.normalizePhoneNumber(phoneNo);
+        if(!PhoneNumberUtils.isGlobalPhoneNumber(phoneNo)) {
+            Toast.makeText(WhitelistContactsActivity.this,
+                    R.string.phone_number_not_valid, Toast.LENGTH_LONG).show();
+            return;
+        }
         if(contactsListView_datasource.contains(phoneNo)){
             Toast.makeText(this, R.string.contact_already_in_the_list, Toast.LENGTH_SHORT).show();
             return;

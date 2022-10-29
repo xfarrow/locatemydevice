@@ -22,4 +22,10 @@
     <string name="empty_sms_command_not_allowed">Empty SMS command not allowed, reverted to default (LMD)</string>
     <string name="long_click_to_delete">Long click to delete</string>
     <string name="contact_already_in_the_list">Contact already in the list</string>
+    <string name="unable_to_retrieve_contact_error">Unable to retrieve contact. Are you using a third-party contact manager app? If so, try with the default one.</string>
+    <string name="add_contact">Add contact</string>
+    <string name="type_a_phone_number">Type a phone number</string>
+    <string name="choose_from_contacts">Choose from contacts</string>
+    <string name="phone_number_not_valid">This number does not appear to be valid</string>
+    <string name="settings">Settings</string>
 </resources>

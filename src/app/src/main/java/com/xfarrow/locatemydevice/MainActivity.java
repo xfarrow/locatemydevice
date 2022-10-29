@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         alert.setTitle(R.string.display_over_other_apps);
         alert.setMessage(R.string.display_over_other_apps_request_description);
 
-        alert.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(R.string.settings, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                 MainActivity.this.startActivity(intent);

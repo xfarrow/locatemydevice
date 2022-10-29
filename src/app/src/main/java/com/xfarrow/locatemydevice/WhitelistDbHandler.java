@@ -77,6 +77,11 @@ public class WhitelistDbHandler extends SQLiteOpenHelper {
     * number without the country code. This is very useful if the user stores in the whitelist a
     * number without the international country code because it'll be checked against the SMS sender's
     * number obtained from the Broadcast, always containing an international country code.
+    *
+    * This might introduce a security risk: if the user saves the following number: 12345
+    * then it will accept communications from +1 12345, +2 12345, +3 12345 and so on...
+    * but we do not know what international prefix the regional "12345" has. The alternative would
+    * be to deny accepting local phone numbers.
     */
     public boolean isContactPresent(String phoneNo){
         SQLiteDatabase db = this.getWritableDatabase();
