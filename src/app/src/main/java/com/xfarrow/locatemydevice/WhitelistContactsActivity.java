@@ -134,7 +134,7 @@ public class WhitelistContactsActivity extends AppCompatActivity {
                     return;
                 }
                 String number = c.getString(phoneIndex);
-                String contactName = (phoneIndex > 0)?  c.getString(contactNameIndex) : "unknown"; // planned to show contact's name as well
+                String contactName = (contactNameIndex > 0)?  c.getString(contactNameIndex) : "unknown"; // planned to show contact's name as well
                 addNumberToWhiteList(number);
             }
             c.close();
