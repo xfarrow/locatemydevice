@@ -29,4 +29,12 @@
     <string name="choose_from_contacts">Scegli dai contatti</string>
     <string name="phone_number_not_valid">Questo numero non appare essere valido</string>
     <string name="settings">Impostazioni</string>
+    <string name="permissions">Permessi</string>
+    <string name="app_permission">Permessi dell\'app</string>
+    <string name="location">Posizione</string>
+    <string name="device_administrator">Amministratore dispositivo</string>
+    <string name="calls">Chiamate</string>
+    <string name="auto_location_on">Attivazione localizzazione automatica</string>
+    <string name="dont_show_again">Non mostrare di nuovo</string>
+    <string name="open_app_settings">Apri impostazioni app</string>
 </resources>

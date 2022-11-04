@@ -14,8 +14,6 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
@@ -31,10 +29,10 @@ import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SmsHandler {
     /*
@@ -45,70 +43,46 @@ public class SmsHandler {
     @SuppressLint("ObsoleteSdkInt")
     public void handleSms(String message, String sender, Context context) {
         Settings settings = new Settings(context);
-        String password = settings.get(Settings.PASSWORD);
-        String command = settings.get(Settings.SMS_COMMAND);
+        SmsManager smsManager = SmsManager.getDefault();
+        String password = settings.getString(Settings.PASSWORD);
+        String command = settings.getString(Settings.SMS_COMMAND);
         String providedOption = "";
         String providedPassword = "";
 
         // Deny communication to those not in the whitelist, if enabled
+        // Deny communication if the message does not start with "LMD "
         WhitelistDbHandler whitelistDbHandler = new WhitelistDbHandler(context);
-        if(Boolean.parseBoolean(settings.get(Settings.WHITELIST_ENABLED)) && !whitelistDbHandler.isContactPresent(sender)){
-            return;
-        }
-
-        String regexToMatch = "^"
-                + command
-                + "\\s"
-                + "[^\\s]*"
-                + "\\s"
-                + Utils.LOCATE_OPTION
-                + "|"
-                + Utils.CELLULAR_INFO_OPTION
-                + "|"
-                + Utils.BATTERY_OPTION
-                + "|"
-                + Utils.CALL_ME_OPTION
-                + "|"
-                + Utils.WIFI_OPTION + "((" + Utils.WIFI_ENABLE_SUBOPTION + ")|(" + Utils.WIFI_DISABLE_SUBOPTION + "))?"
-                + "|"
-                + Utils.LOCK_OPTION
-                + "|"
-                + Utils.SHOW_MESSAGE_OPTION + "\\s+\"[\\w\\W]*[\"]$"
-                + "|"
-                + Utils.RING_OPTION;
-
-        Pattern pattern = Pattern.compile(regexToMatch);
-        Matcher matcher = pattern.matcher(message);
-        if (!matcher.find()) {
+        if(!message.startsWith(command + " ") || (settings.getBoolean(Settings.WHITELIST_ENABLED) && !whitelistDbHandler.isContactPresent(sender))){
             return;
         }
 
         String[] splitMessage = message.split(" ");
+        if(Arrays.stream(splitMessage).count() < 3){
+            return;
+        }
         providedPassword = splitMessage[1];
-        providedOption = splitMessage[2];
+        providedOption = splitMessage[2].toLowerCase();
 
+        // Deny communication if the password is not valid
         if (!CipherUtils.get256Sha(providedPassword).equals(password)) {
             return;
         }
-
-        SmsManager smsManager = SmsManager.getDefault();
 
         // locate
         if (providedOption.equals(Utils.LOCATE_OPTION)) {
 
             LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-            // location not enabled
-            if(!locationManager.isLocationEnabled()){
-                // TODO: get last known location (requies google play services)
-                String response ="Location is not enabled. Unable to serve request.";
+            // location not enabled and unable to turn it on
+            if(!locationManager.isLocationEnabled() && !Utils.toggleLocationOn(context)){
+                String response = "Location is not enabled. Unable to serve request.";
                 Utils.sendSms(smsManager, response, sender);
                 return;
             }
 
             // Location permission not granted
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                String response ="Location permission is not granted. Unable to serve request.";
+                String response = "Location permission is not granted. Unable to serve request.";
                 Utils.sendSms(smsManager, response, sender);
                 return;
             }
@@ -149,10 +123,20 @@ public class SmsHandler {
             String country = telephony.getNetworkCountryIso();
             responseSms.append(Utils.getCountryNameByIso(country)).append("\n\n");
 
+            // getAllCellInfo() requires Location services to work
+            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            boolean isLocationOn;
+            isLocationOn = locationManager.isLocationEnabled() || Utils.toggleLocationOn(context);
+
             List<CellInfo> availableTowersInRange = telephony.getAllCellInfo();
             responseSms.append("Towers in range: ");
             if(availableTowersInRange.size() == 0) {
-                responseSms.append("none or location is off.");
+                if(isLocationOn){
+                    responseSms.append("none");
+                }
+                else{
+                    responseSms.append("unable to serve request, location is off");
+                }
             }
 
             for(CellInfo tower : availableTowersInRange){
@@ -260,7 +244,7 @@ public class SmsHandler {
 
             LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-            if(!locationManager.isLocationEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && !locationManager.isLocationEnabled() && !Utils.toggleLocationOn(context)) {
                 responseSms.append("Location is off. Unable to execute command.");
                 Utils.sendSms(smsManager, responseSms.toString(), sender);
                 return;
@@ -298,9 +282,9 @@ public class SmsHandler {
             Utils.sendSms(smsManager, responseSms.toString(), sender);
         }
 
-        // wifi-enabled OR wifi-disabled
-        else if(providedOption.contains(Utils.WIFI_OPTION) && (providedOption.contains(Utils.WIFI_ENABLE_SUBOPTION)
-        || providedOption.contains(Utils.WIFI_DISABLE_SUBOPTION))){
+        // wifi-on OR wifi-off
+        else if(providedOption.contains(Utils.WIFI_OPTION) && (providedOption.contains(Utils.ON_SUBOPTION)
+        || providedOption.contains(Utils.OFF_SUBOPTION))){
 
             StringBuilder responseSms = new StringBuilder();
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
@@ -310,7 +294,7 @@ public class SmsHandler {
             }
 
             WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            wifiManager.setWifiEnabled(providedOption.contains(Utils.WIFI_ENABLE_SUBOPTION));
+            wifiManager.setWifiEnabled(providedOption.contains(Utils.ON_SUBOPTION));
             responseSms.append("Command executed");
             Utils.sendSms(smsManager, responseSms.toString(), sender);
         }
@@ -361,6 +345,35 @@ public class SmsHandler {
             context.startActivity(ringerActivityIntent);
 
             Utils.sendSms(smsManager, "Ringing", sender);
+        }
+
+        else{
+            StringBuilder responseSms = new StringBuilder("This option is not valid. Available options:\n\n");
+
+            responseSms.append(Utils.LOCATE_OPTION + ": Will return the most accurate set of coordinates possible " +
+                        "and a link to them pinpointed to OpenStreetMap.\n\n");
+
+            responseSms.append(Utils.CELLULAR_INFO_OPTION + ": Will return a set of uniquely identifiable information" +
+                    " about cell towers near the phone. You can then put this information" +
+                    " on OpenCellId to individuate the smartphone's approximate location.\n\n");
+
+            responseSms.append(Utils.BATTERY_OPTION + ": Will return battery info.\n\n");
+
+            responseSms.append(Utils.LOCK_OPTION + ": Will lock down the smartphone.\n\n");
+
+            responseSms.append(Utils.SHOW_MESSAGE_OPTION + " \"message\": Will show a message on the screen, even when it's locked.\n\n");
+
+            responseSms.append(Utils.CALL_ME_OPTION + ": You will receive a call from the lost smartphone\n\n");
+
+            responseSms.append(Utils.WIFI_OPTION + ": Will return Wi-Fi infos.\n\n");
+
+            responseSms.append(Utils.WIFI_OPTION + Utils.ON_SUBOPTION + ": Will enable Wi-Fi (Only API < 29).\n\n");
+
+            responseSms.append(Utils.WIFI_OPTION + Utils.OFF_SUBOPTION + ": Will disable Wi-Fi (Only API < 29).\n\n");
+
+            responseSms.append(Utils.RING_OPTION + ": Will make the smartphone ring.\n\n");
+
+            Utils.sendSms(smsManager, responseSms.toString(), sender);
         }
     }
 }

@@ -27,6 +27,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Button addContactsButton;
     private Settings settings;
     private LinearLayout infoLinearLayout;
+    private LinearLayout permissionsLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +46,14 @@ public class SettingsActivity extends AppCompatActivity {
         whitelistSwitch = findViewById(R.id.SwitchWhitelist);
         addContactsButton = findViewById(R.id.buttonAddContacts);
         infoLinearLayout = findViewById(R.id.info_layout);
+        permissionsLinearLayout = findViewById(R.id.permissions_layout);
 
-        addContactsButton.setEnabled(Boolean.parseBoolean(settings.get(Settings.WHITELIST_ENABLED)));
-        whitelistSwitch.setChecked(Boolean.parseBoolean(settings.get(Settings.WHITELIST_ENABLED)));
+        addContactsButton.setEnabled(settings.getBoolean(Settings.WHITELIST_ENABLED));
+        whitelistSwitch.setChecked(settings.getBoolean(Settings.WHITELIST_ENABLED));
     }
 
     private void setValues(){
-        editTextLmdCommand.setText(settings.get(Settings.SMS_COMMAND));
+        editTextLmdCommand.setText(settings.getString(Settings.SMS_COMMAND));
     }
 
     private void setListeners(){
@@ -69,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String text = input.getText().toString();
                         if (!text.isEmpty()) {
-                            settings.set(Settings.PASSWORD, CipherUtils.get256Sha(text));
+                            settings.setString(Settings.PASSWORD, CipherUtils.get256Sha(text));
                         }
                         else{
                             Toast.makeText(SettingsActivity.this, R.string.cannot_use_a_blank_password, Toast.LENGTH_LONG).show();
@@ -115,9 +117,9 @@ public class SettingsActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 if (s.toString().isEmpty()) {
                     Toast.makeText(SettingsActivity.this, R.string.empty_sms_command_not_allowed, Toast.LENGTH_LONG).show();
-                    settings.set(Settings.SMS_COMMAND, settings.defaultValues(Settings.SMS_COMMAND));
+                    settings.setString(Settings.SMS_COMMAND, (String)settings.defaultValues(Settings.SMS_COMMAND));
                 } else {
-                    settings.set(Settings.SMS_COMMAND, s.toString());
+                    settings.setString(Settings.SMS_COMMAND, s.toString());
                 }
             }
         });
@@ -126,7 +128,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 addContactsButton.setEnabled(isChecked);
-                settings.set(Settings.WHITELIST_ENABLED, String.valueOf(isChecked));
+                settings.setBoolean(Settings.WHITELIST_ENABLED, isChecked);
             }
         });
 
@@ -142,6 +144,14 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent myIntent = new Intent(SettingsActivity.this, AppInfoActivity.class);
+                SettingsActivity.this.startActivity(myIntent);
+            }
+        });
+
+        permissionsLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(SettingsActivity.this, PermissionsActivity.class);
                 SettingsActivity.this.startActivity(myIntent);
             }
         });

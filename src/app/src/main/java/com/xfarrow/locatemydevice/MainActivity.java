@@ -18,6 +18,8 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Settings settings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,16 +56,18 @@ public class MainActivity extends AppCompatActivity {
             );
         }
 
+        settings = new Settings(this);
+
         // Request display overlay
-        if(!android.provider.Settings.canDrawOverlays(this)) {
+        if(!android.provider.Settings.canDrawOverlays(this) && !settings.getBoolean(Settings.DO_NOT_SHOW_OVERLAY_PERMISSION_AGAIN)) {
             displayDrawOverlayPermissionDialog();
         }
 
         // Admin permission
         ComponentName cn = new ComponentName(this, AdminReceiver.class);
         DevicePolicyManager mgr = (DevicePolicyManager)getSystemService(DEVICE_POLICY_SERVICE);
-        if(!mgr.isAdminActive(cn)){
-            requestAdminPermission(cn);
+        if(!mgr.isAdminActive(cn) && !settings.getBoolean(Settings.DO_NOT_SHOW_DEVICE_ADMIN_PERMISSION_AGAIN)){
+            displayAdminPermissionDialog(cn);
         }
     }
 
@@ -79,6 +83,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        alert.setNegativeButton(R.string.dont_show_again, new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(settings != null)
+                    settings.setBoolean(Settings.DO_NOT_SHOW_OVERLAY_PERMISSION_AGAIN, true);
+            }
+        });
+
         alert.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -88,11 +100,35 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
-    public void requestAdminPermission(ComponentName cn){
-        Intent intent= new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cn);
-        intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, R.string.admin_permission_request_description);
-        startActivity(intent);
+    public void displayAdminPermissionDialog(ComponentName cn){
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(R.string.device_administrator);
+        alert.setMessage(R.string.admin_permission_request_description);
+
+        alert.setPositiveButton(R.string.settings, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                Intent intent= new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+                intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cn);
+                intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, R.string.admin_permission_request_description);
+                startActivity(intent);
+            }
+        });
+
+        alert.setNegativeButton(R.string.dont_show_again, new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(settings != null)
+                    settings.setBoolean(Settings.DO_NOT_SHOW_DEVICE_ADMIN_PERMISSION_AGAIN, true);
+            }
+        });
+
+        alert.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        alert.show();
     }
 
     @Override
