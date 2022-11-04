@@ -31,9 +31,29 @@ lock | Will  lock down the smartphone | Device Administrator |
 show "message" | Will show a message on the screen, even when it's locked. | Overlay |
 callme | You will receive a call from the lost smartphone | Calls, Overlay |
 wifi | Will return Wi-Fi infos | Location |
-wifi-enable | Will enable Wi-Fi (Only API < 29) | None |
-wifi-disable | Will disable Wi-Fi (Only API < 29) | None |
+wifi-on | Will enable Wi-Fi (Only API < 29) | None |
+wifi-off | Will disable Wi-Fi (Only API < 29) | None |
 ring | Will make the smartphone ring | Overlay |
+
+### Auto enabling location
+
+The app is able to automatically enabe location if it is off, but you need to grant a specific command through adb.
+
+Requirements:
+* Min. Android 4.4
+* Grant permission via ADB
+
+To grant the permission you need to do the following:
+1. Install ADB (https://developer.android.com/studio/releases/platform-tools.html)
+2. Activate Developer options on your phone (https://developer.android.com/studio/debug/dev-options#enable)
+3. In the Developer options enable USB debugging (https://developer.android.com/studio/debug/dev-options#debugging)
+4. Connect your phone with your computer via USB
+5. On your computer open a terminal, change to the directory where you extracted the platform tools and run the following command
+
+```
+adb shell pm grant com.xfarrow.locatemydevice android.permission.WRITE_SECURE_SETTINGS
+```
+
 
 ## Security
 ### Security measures in place
