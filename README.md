@@ -37,11 +37,7 @@ ring | Will make the smartphone ring | Overlay |
 
 ### Auto enabling location (only 1.1-beta)
 
-The app is able to automatically enabe location if it is off, but you need to grant a specific command through adb.
-
-Requirements:
-* Min. Android 4.4
-* Grant permission via ADB
+The app is able to automatically enabe location if it is off, but you need to grant a specific permission through adb.
 
 To grant the permission you need to do the following:
 1. Install ADB (https://developer.android.com/studio/releases/platform-tools.html)
