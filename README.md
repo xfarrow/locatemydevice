@@ -35,7 +35,7 @@ wifi-on | Will enable Wi-Fi (Only API < 29) | None |
 wifi-off | Will disable Wi-Fi (Only API < 29) | None |
 ring | Will make the smartphone ring | Overlay |
 
-### Auto enabling location
+### Auto enabling location (only 1.1-beta)
 
 The app is able to automatically enabe location if it is off, but you need to grant a specific command through adb.
 
