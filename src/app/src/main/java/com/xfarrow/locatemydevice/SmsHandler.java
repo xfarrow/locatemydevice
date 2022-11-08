@@ -27,6 +27,8 @@ import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
@@ -35,6 +37,17 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class SmsHandler {
+
+    /*
+    * TODO When Location is automatically enabled, it is not fast enough to lock on to the satellite.
+    *  This causes:
+    *   1. On Android >= API 31 a location = null
+    *   2. On Android < API 31 to never fire onLocationChanged()
+    *   We should wait for the signal to stabilize before calling these methods but a prefixed sleep
+    *  time might be wrong and/or inefficient. Help wanted!
+    * https://stackoverflow.com/questions/74367356/problem-with-locationmanager-and-broadcastreceiver-in-android
+     */
+
     /*
      * Messages:
      * [command] [password] [option]
@@ -49,7 +62,7 @@ public class SmsHandler {
         String providedOption = "";
         String providedPassword = "";
 
-        // Deny communication to those not in the whitelist, if enabled
+        // Deny communication to those not in the whitelist, if enabled.
         // Deny communication if the message does not start with "LMD "
         WhitelistDbHandler whitelistDbHandler = new WhitelistDbHandler(context);
         if(!message.startsWith(command + " ") || (settings.getBoolean(Settings.WHITELIST_ENABLED) && !whitelistDbHandler.isContactPresent(sender))){
@@ -92,6 +105,9 @@ public class SmsHandler {
                 locationManager.getCurrentLocation(LocationManager.FUSED_PROVIDER, null, context.getMainExecutor(), new Consumer<Location>() {
                     @Override
                     public void accept(Location location) {
+                        if(location == null)
+                            return;
+
                         String response = Utils.buildCoordinatesResponse(location.getLatitude(), location.getLongitude());
                         Utils.sendSms(smsManager, response , sender);
                     }
@@ -105,8 +121,19 @@ public class SmsHandler {
                 locationManager.requestSingleUpdate(locationCriteria, new LocationListener() {
                     @Override
                     public void onLocationChanged(@NonNull Location location) {
+                        Log.d("SmsHandler", "Going to send coordinates: " + location.getLatitude() + " " + location.getLongitude());
                         String response = Utils.buildCoordinatesResponse(location.getLatitude(), location.getLongitude());
                         Utils.sendSms(smsManager, response, sender);
+                    }
+
+                    @Override
+                    public void onProviderEnabled(@NonNull String provider) {
+                        Log.d("SmsHandler", "PROVIDER ENABLED");
+                    }
+
+                    @Override
+                    public void onProviderDisabled(@NonNull String provider) {
+                        Log.d("SmsHandler", "PROVIDER DISABLED");
                     }
                 }, null);
             }
@@ -316,9 +343,15 @@ public class SmsHandler {
 
         // show
         else if(providedOption.contains(Utils.SHOW_MESSAGE_OPTION)){
-            String messageToDisplay = message.substring(message.indexOf("\"") + 1,
-                    message.lastIndexOf("\""));
-
+            String messageToDisplay;
+            try {
+                 messageToDisplay = message.substring(message.indexOf("\"") + 1,
+                        message.lastIndexOf("\""));
+            }
+            catch(StringIndexOutOfBoundsException ex){
+                Utils.sendSms(smsManager, "Wrong usage", sender);
+                return;
+            }
             Intent lockScreenMessage = new Intent(context, ShowMessageActivity.class);
             lockScreenMessage.putExtra(Utils.SHOW_MESSAGE_OPTION, messageToDisplay);
             lockScreenMessage.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
