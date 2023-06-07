@@ -2,7 +2,8 @@
 This app helps to locate a lost smartphone through the use of conventional SMS. 
 
 <a href="https://github.com/xfarrow/locatemydevice/releases/latest"><img src="http://yt3dl.net/images/apk-download-badge.png" alt="Get it on Github" height="100"></a>
-<a href="https://apt.izzysoft.de/fdroid/index/apk/com.xfarrow.locatemydevice"><img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="100"></a>
+<a href="https://apt.izzysoft.de/fdroid/index/apk/com.xfarrow.locatemydevice"><img src="images/IzzyOnDroid_badge.png" alt="Get it on IzzyOnDroid" height="100"></a>
+<!--a href="https://f-droid.org/packages/com.xfarrow.locatemydevice/"><img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="100"></a-->
 
 ## Screenshots
 | Homescreen | SMS Chat
