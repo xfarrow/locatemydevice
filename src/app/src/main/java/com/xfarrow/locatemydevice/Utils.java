@@ -27,6 +27,7 @@ public class Utils {
     public static final String BATTERY_OPTION = "battery";
     public static final String CALL_ME_OPTION = "callme";
     public static final String WIFI_OPTION = "wifi";
+    public static final String GPS_OPTION = "gps";
     public static final String LOCK_OPTION = "lock";
     public static final String SHOW_MESSAGE_OPTION = "show";
     public static final String RING_OPTION = "ring";
@@ -87,6 +88,27 @@ public class Utils {
                     android.provider.Settings.Secure.LOCATION_MODE,
                     android.provider.Settings.Secure.LOCATION_MODE_HIGH_ACCURACY);
 
+    }
+
+    // forcefully toggle location services on (secure setting - needs permission to be granted via adb)
+    @SuppressLint("ObsoleteSdkInt")
+    public static boolean setLocation(Context context, boolean state){
+
+        if (Build.VERSION.SDK_INT < 19) {
+            return false;
+        }
+
+        if(ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_SECURE_SETTINGS) != PackageManager.PERMISSION_GRANTED){
+            return false;
+        }
+
+        int locationMode = state
+                ? android.provider.Settings.Secure.LOCATION_MODE_HIGH_ACCURACY // On
+                : android.provider.Settings.Secure.LOCATION_MODE_OFF;
+
+        return android.provider.Settings.Secure.putInt(context.getContentResolver(),
+                android.provider.Settings.Secure.LOCATION_MODE,
+                locationMode);
     }
 
     // forcefully toggle location services off (secure setting - needs permission to be granted via adb)

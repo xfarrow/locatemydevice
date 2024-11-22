@@ -34,6 +34,8 @@ callme | You will receive a call from the lost smartphone | Calls, Overlay |
 wifi | Will return Wi-Fi infos | Location |
 wifi-on | Will enable Wi-Fi (Only API < 29) | None |
 wifi-off | Will disable Wi-Fi (Only API < 29) | None |
+gps-on | Will enable GPS.  | WRITE_SECURE_SETTINGS
+gps-off | Will disable GPS. | WRITE_SECURE_SETTINGS
 ring | Will make the smartphone ring | Overlay |
 
 ### Auto enabling location (only 1.1-beta)

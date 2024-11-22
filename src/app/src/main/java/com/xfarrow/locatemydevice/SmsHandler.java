@@ -87,7 +87,7 @@ public class SmsHandler {
             LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
             // location not enabled and unable to turn it on
-            if(!locationManager.isLocationEnabled() && !Utils.toggleLocationOn(context)){
+            if(!locationManager.isLocationEnabled() && !Utils.setLocation(context, true)){
                 String response = "Location is not enabled. Unable to serve request.";
                 Utils.sendSms(smsManager, response, sender);
                 return;
@@ -153,7 +153,7 @@ public class SmsHandler {
             // getAllCellInfo() requires Location services to work
             LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
             boolean isLocationOn;
-            isLocationOn = locationManager.isLocationEnabled() || Utils.toggleLocationOn(context);
+            isLocationOn = locationManager.isLocationEnabled() || Utils.setLocation(context, true);
 
             List<CellInfo> availableTowersInRange = telephony.getAllCellInfo();
             responseSms.append("Towers in range: ");
@@ -271,7 +271,7 @@ public class SmsHandler {
 
             LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && !locationManager.isLocationEnabled() && !Utils.toggleLocationOn(context)) {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && !locationManager.isLocationEnabled() && !Utils.setLocation(context, true)) {
                 responseSms.append("Location is off. Unable to execute command.");
                 Utils.sendSms(smsManager, responseSms.toString(), sender);
                 return;
@@ -310,8 +310,7 @@ public class SmsHandler {
         }
 
         // wifi-on OR wifi-off
-        else if(providedOption.contains(Utils.WIFI_OPTION) && (providedOption.contains(Utils.ON_SUBOPTION)
-        || providedOption.contains(Utils.OFF_SUBOPTION))){
+        else if(providedOption.contains(Utils.WIFI_OPTION) && (providedOption.contains(Utils.ON_SUBOPTION) || providedOption.contains(Utils.OFF_SUBOPTION))){
 
             StringBuilder responseSms = new StringBuilder();
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
@@ -324,6 +323,21 @@ public class SmsHandler {
             wifiManager.setWifiEnabled(providedOption.contains(Utils.ON_SUBOPTION));
             responseSms.append("Command executed");
             Utils.sendSms(smsManager, responseSms.toString(), sender);
+        }
+
+        // gps-on OR gps-off
+        else if(providedOption.contains(Utils.GPS_OPTION) && (providedOption.contains(Utils.ON_SUBOPTION) || providedOption.contains(Utils.OFF_SUBOPTION))){
+
+            boolean state = providedOption.contains(Utils.ON_SUBOPTION);
+            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            // location not enabled and unable to turn it on
+            if(!Utils.setLocation(context, state)){
+                String response = state ? "Failed to enable GPS." : "Failed to disable GPS.";
+                Utils.sendSms(smsManager, response, sender);
+                return;
+            }
+            String response = state ? "GPS enabled." : "GPS disabled.";
+            Utils.sendSms(smsManager, response, sender);
         }
 
         // lock
@@ -380,7 +394,7 @@ public class SmsHandler {
             Utils.sendSms(smsManager, "Ringing", sender);
         }
 
-        else{
+        else {
             StringBuilder responseSms = new StringBuilder("This option is not valid. Available options:\n\n");
 
             responseSms.append(Utils.LOCATE_OPTION + ": Will return the most accurate set of coordinates possible " +
@@ -403,6 +417,10 @@ public class SmsHandler {
             responseSms.append(Utils.WIFI_OPTION + Utils.ON_SUBOPTION + ": Will enable Wi-Fi (Only API < 29).\n\n");
 
             responseSms.append(Utils.WIFI_OPTION + Utils.OFF_SUBOPTION + ": Will disable Wi-Fi (Only API < 29).\n\n");
+
+            responseSms.append(Utils.GPS_OPTION + Utils.ON_SUBOPTION + ": Will enable GPS.\n\n");
+
+            responseSms.append(Utils.GPS_OPTION + Utils.OFF_SUBOPTION + ": Will disable GPS.\n\n");
 
             responseSms.append(Utils.RING_OPTION + ": Will make the smartphone ring.\n\n");
 
