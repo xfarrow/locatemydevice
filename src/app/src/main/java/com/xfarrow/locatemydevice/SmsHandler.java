@@ -384,7 +384,7 @@ public class SmsHandler {
             StringBuilder responseSms = new StringBuilder("This option is not valid. Available options:\n\n");
 
             responseSms.append(Utils.LOCATE_OPTION + ": Will return the most accurate set of coordinates possible " +
-                        "and a link to them pinpointed to OpenStreetMap.\n\n");
+                        "and a link to them pinpointed to Google Maps.\n\n");
 
             responseSms.append(Utils.CELLULAR_INFO_OPTION + ": Will return a set of uniquely identifiable information" +
                     " about cell towers near the phone. You can then put this information" +

@@ -50,7 +50,7 @@ public class Utils {
                 .append("\nLongitude: ")
                 .append(longitude)
                 .append("\n")
-                .append("https://www.openstreetmap.org/?mlat=").append(latitude).append("&mlon=").append(longitude).toString();
+                .append("https://www.google.com/maps?q=").append(latitude).append(",").append(longitude).toString();
     }
 
     // returns the country code from a phone number. For example +393340000000 will return "39"
